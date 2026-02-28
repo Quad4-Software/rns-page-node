@@ -18,6 +18,7 @@ COPY rns_page_node ./rns_page_node
 
 RUN poetry config virtualenvs.in-project true && \
     poetry install --no-interaction --no-ansi --only main && \
+    .venv/bin/pip install --upgrade 'pip>=26.0' && \
     poetry build --format wheel && \
     .venv/bin/pip install dist/*.whl
 
