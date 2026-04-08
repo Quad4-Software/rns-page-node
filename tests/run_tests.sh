@@ -61,12 +61,11 @@ if [ ! -f node-config/identity ]; then
   exit 1
 fi
 
-# Run the client test
-poetry run python3 test_client.py
+echo "Running pytest (unit + advanced)..."
+poetry run pytest test_handlers_unit.py test_config_unit.py test_path_security.py test_advanced.py
 
-# Run advanced tests
-echo "Running advanced tests (smoke, performance, leak, fuzzing, property-based)..."
-poetry run python3 test_advanced.py
+echo "Running transport integration client..."
+poetry run python3 test_client.py
 
 # Clean up
 kill $NODE_PID || true

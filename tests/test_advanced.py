@@ -102,7 +102,7 @@ class AdvancedTests(unittest.TestCase):
                 random.choices(string.ascii_letters + string.digits + "/.", k=20),
             )
             # Should not crash
-            res_p = self.node.serve_page(random_path, None, None, None, None, None)
+            self.node.serve_page(random_path, None, None, None, None, None)
             res_f = self.node.serve_file(random_path, None, None, None, None, None)
 
             # Close file handles if returned to avoid ResourceWarnings
@@ -123,8 +123,7 @@ class AdvancedTests(unittest.TestCase):
             self.node.serve_page("/page/index.mu", random_data, None, None, None, None)
 
     def test_property_based(self):
-        """Property-based testing for path traversal and response types."""
-        # Property: serve_page should never return contents from outside pages_dir
+        """Path traversal blocked; file responses are list or denied bytes."""
         traversal_paths = [
             "/page/../../etc/passwd",
             "/page/../main.py",
@@ -138,7 +137,6 @@ class AdvancedTests(unittest.TestCase):
                 f"Path traversal succeeded for {path}",
             )
 
-        # Property: serve_file should always return a list with [fileobj, headers] or bytes
         response = self.node.serve_file("/file/test.txt", None, None, None, None, None)
         try:
             self.assertTrue(isinstance(response, list) or isinstance(response, bytes))
