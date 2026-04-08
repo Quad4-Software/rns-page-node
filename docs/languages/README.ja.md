@@ -12,7 +12,7 @@
 
 ## インストール
 
-### PyPI から (推奨)
+### PyPI から
 
 ```bash
 pip install rns-page-node
@@ -65,8 +65,8 @@ pip install rns_page_node-1.4.0-py3-none-any.whl
 
 ```bash
 # Pip
-pipx install git+https://git.quad4.io/RNS-Things/rns-page-node.git
-# Git 経由の Pipx
+pip install git+https://git.quad4.io/RNS-Things/rns-page-node.git --break-system-packages
+# Pipx（Git）
 pipx install git+https://git.quad4.io/RNS-Things/rns-page-node.git
 # UV
 uv venv
@@ -143,6 +143,16 @@ make wheel
 ```bash
 make docker-wheels
 ```
+
+## 開発
+
+```bash
+poetry install
+bash tests/run_tests.sh
+ruff check .
+```
+
+`make test` は `tests/run_tests.sh` と同じスクリプトを実行します。
 
 ## ページ
 

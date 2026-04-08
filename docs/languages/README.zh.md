@@ -2,7 +2,7 @@
 
 [English](../../README.md) | [Русский](README.ru.md) | [日本語](README.ja.md) | [Italiano](README.it.md) | [Deutsch](README.de.md)
 
-一种通过 [Reticulum 网络](https://reticulum.network/) 提供页面和文件的简单方法。主要用于提供页面和文件的 [NomadNet](https://github.com/markqvist/NomadNet) 节点的掉入式替代方案。
+一种通过 [Reticulum 网络](https://reticulum.network/) 提供页面和文件的简单方法。主要用于提供页面和文件的 [NomadNet](https://github.com/markqvist/NomadNet) 节点的即插即用替代方案。
 
 ## 特性
 
@@ -12,7 +12,7 @@
 
 ## 安装
 
-### 从 PyPI (推荐)
+### 从 PyPI
 
 ```bash
 pip install rns-page-node
@@ -65,8 +65,8 @@ pip install rns_page_node-1.4.0-py3-none-any.whl
 
 ```bash
 # Pip
-pipx install git+https://git.quad4.io/RNS-Things/rns-page-node.git
-# 通过 Git 安装 Pipx
+pip install git+https://git.quad4.io/RNS-Things/rns-page-node.git --break-system-packages
+# Pipx（Git）
 pipx install git+https://git.quad4.io/RNS-Things/rns-page-node.git
 # UV
 uv venv
@@ -143,6 +143,16 @@ make wheel
 ```bash
 make docker-wheels
 ```
+
+## 开发
+
+```bash
+poetry install
+bash tests/run_tests.sh
+ruff check .
+```
+
+`make test` 与 `tests/run_tests.sh` 运行同一测试脚本。
 
 ## 页面
 

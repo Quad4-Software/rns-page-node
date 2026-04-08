@@ -12,7 +12,7 @@
 
 ## Установка
 
-### Из PyPI (Рекомендуется)
+### Из PyPI
 
 ```bash
 pip install rns-page-node
@@ -65,8 +65,8 @@ pip install rns_page_node-1.4.0-py3-none-any.whl
 
 ```bash
 # Pip
-pipx install git+https://git.quad4.io/RNS-Things/rns-page-node.git
-# Pipx через Git
+pip install git+https://git.quad4.io/RNS-Things/rns-page-node.git --break-system-packages
+# Pipx (Git)
 pipx install git+https://git.quad4.io/RNS-Things/rns-page-node.git
 # UV
 uv venv
@@ -135,6 +135,16 @@ make wheel
 ```bash
 make docker-wheels
 ```
+
+## Разработка
+
+```bash
+poetry install
+bash tests/run_tests.sh
+ruff check .
+```
+
+`make test` запускает тот же сценарий, что и `tests/run_tests.sh`.
 
 ## Страницы
 

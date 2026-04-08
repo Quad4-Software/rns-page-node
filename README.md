@@ -144,6 +144,16 @@ make wheel
 make docker-wheels
 ```
 
+## Development
+
+```bash
+poetry install
+bash tests/run_tests.sh
+ruff check .
+```
+
+`make test` runs the same script as `tests/run_tests.sh`.
+
 ## Pages
 
 Supports dynamic executable pages with full request data parsing. Pages can receive:
