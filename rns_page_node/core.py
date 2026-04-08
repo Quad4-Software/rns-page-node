@@ -1,4 +1,4 @@
-"""Core logic for the RNS Page Node."""
+"""PageNode: register .mu pages and files on an RNS destination."""
 
 import threading
 import time
@@ -11,7 +11,7 @@ from .handlers import serve_default_index, serve_file, serve_page
 
 
 class PageNode:
-    """A Reticulum page node that serves .mu pages and files over RNS."""
+    """Serves .mu pages and static files from disk over a single RNS destination."""
 
     def __init__(
         self,
@@ -23,18 +23,6 @@ class PageNode:
         page_refresh_interval: int = 0,
         file_refresh_interval: int = 0,
     ) -> None:
-        """Initialize the PageNode.
-
-        Args:
-            identity: RNS Identity for the node
-            pagespath: Path to directory containing .mu pages
-            filespath: Path to directory containing files to serve
-            announce_interval: Minutes between announcements (default: 360) == 6 hours
-            name: Display name for the node (optional)
-            page_refresh_interval: Seconds between page rescans (0 = disabled)
-            file_refresh_interval: Seconds between file rescans (0 = disabled)
-
-        """
         self._stop_event = threading.Event()
         self._lock = threading.Lock()
         self.identity = identity
@@ -79,7 +67,6 @@ class PageNode:
         remote_identity: Any,
         requested_at: float,
     ) -> bytes:
-        """Serve a .mu page file."""
         return serve_page(
             path,
             data,
@@ -99,7 +86,6 @@ class PageNode:
         remote_identity: Any,
         requested_at: float,
     ) -> Any:
-        """Serve a file."""
         return serve_file(
             path,
             data,
@@ -111,7 +97,6 @@ class PageNode:
         )
 
     def register_pages(self) -> None:
-        """Scan pages directory and register request handlers for all .mu files."""
         pages = self._scan_pages(self.pagespath)
 
         with self._lock:
@@ -140,7 +125,6 @@ class PageNode:
             )
 
     def register_files(self) -> None:
-        """Scan files directory and register request handlers for all files."""
         files = self._scan_files(self.filespath)
 
         with self._lock:
@@ -163,7 +147,6 @@ class PageNode:
             )
 
     def _scan_pages(self, base: Union[Path, str]) -> List[str]:
-        """Return a list of page paths under the given directory, excluding .allowed files."""
         if isinstance(base, str):
             base = Path(base)
         if not base.exists():
@@ -179,7 +162,6 @@ class PageNode:
         return served
 
     def _scan_files(self, base: Union[Path, str]) -> List[str]:
-        """Return all file paths under the given directory."""
         if isinstance(base, str):
             base = Path(base)
         if not base.exists():
@@ -194,12 +176,10 @@ class PageNode:
                 served.append(str(entry))
         return served
 
-    def on_connect(self, link: Any) -> None:
-        """Handle new link connections."""
-        # This can be expanded in the future
+    def on_connect(self, _link: Any) -> None:
+        pass
 
     def _announce_loop(self) -> None:
-        """Periodically announce the node until shutdown is requested."""
         interval_seconds = max(self.announce_interval, 0) * 60
         try:
             while not self._stop_event.is_set():
@@ -232,7 +212,6 @@ class PageNode:
             RNS.log(f"Error in announce loop: {e}", RNS.LOG_ERROR)
 
     def _refresh_loop(self) -> None:
-        """Refresh page and file registrations at configured intervals."""
         try:
             while not self._stop_event.is_set():
                 now = time.time()
@@ -273,7 +252,6 @@ class PageNode:
             RNS.log(f"Error in refresh loop: {e}", RNS.LOG_ERROR)
 
     def shutdown(self) -> None:
-        """Gracefully shutdown the PageNode and cleanup resources."""
         RNS.log("Shutting down PageNode...", RNS.LOG_INFO)
         self._stop_event.set()
         try:
