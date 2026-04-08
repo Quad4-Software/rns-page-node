@@ -65,7 +65,7 @@ test:
 	bash tests/run_tests.sh
 
 test-advanced:
-	poetry run python3 tests/test_advanced.py
+	poetry run pytest tests/test_advanced.py
 
 docker-test:
 	$(DOCKER_BUILD_LOAD) -f docker/Dockerfile.tests -t rns-page-node-tests .
@@ -89,7 +89,7 @@ help:
 	@echo "  docker-run     - run runtime Docker image"
 	@echo "  test                 - run local integration tests"
 	@echo "  docker-test          - build and run integration tests in Docker"
-	@echo "  test-advanced        - run advanced tests (smoke, performance, leak, etc)"
+	@echo "  test-advanced        - run advanced tests via pytest"
 	@echo "  publish              - publish to both Gitea and PyPI"
 	@echo "  publish-gitea        - publish to Gitea registry"
 	@echo "  publish-pypi         - publish to PyPI"

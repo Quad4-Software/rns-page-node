@@ -73,7 +73,7 @@ tasks:
   test-advanced:
     desc: Run advanced tests (smoke, performance, leak, fuzzing, property-based)
     cmds:
-      - poetry run python3 tests/test_advanced.py
+      - poetry run pytest tests/test_advanced.py
 
   docker-wheels:
     desc: Build Python wheels in Docker
@@ -162,16 +162,6 @@ tasks:
     desc: Create required directories for running the node
     cmds:
       - mkdir -p pages files node-config reticulum-config
-
-  nix-shell:
-    desc: Enter Nix development shell
-    cmds:
-      - nix develop
-
-  nix-build:
-    desc: Build with Nix
-    cmds:
-      - nix build
 
   all:
     desc: Run build, lint, and test
