@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.1] - 2026-04-08
+
+### Dependencies
+- **Runtime**: `rns` `>=1.1.3,<1.5.0` (lock: 1.1.4); `cryptography` `>=46.0.5,<47` (lock: 46.0.7).
+- **Development**: `pytest` ^8.4 (lock: 8.4.2), `hypothesis` ^6.135 (lock: 6.141.1), `ruff` ^0.14.10 (lock: 0.14.14), `build` ^1.3 (lock: 1.4.2), `twine` ^6.2.0 (lock: 6.2.0). `pytest` configuration added under `[tool.pytest.ini_options]` in `pyproject.toml`.
+
+### Security
+- Page and file handlers now resolve paths under the configured root using `Path.resolve()` and `Path.relative_to()`, replacing string prefix checks so directory traversal and prefix edge cases are rejected consistently; invalid paths during resolution are handled safely. Relative segments reject embedded NUL bytes and normalize backslashes to forward slashes before resolving (Windows-style `..\\..\\file` cannot bypass checks on POSIX by being treated as a single file name).
+- `tests/test_path_security.py`: parametrized traversal cases, outside-file marker never appears under Hypothesis fuzzing of path components, and invariants on `_safe_file_in_root` results.
+
+### Changed
+- `tests/run_tests.sh` runs `pytest` (unit, property, and advanced tests) before the local transport client script.
+- `README.md` and localized readmes (`docs/languages/README.*.md`): Git install commands match the English guide; **Development** section added (Poetry, `tests/run_tests.sh`, Ruff). `Makefile` `test-advanced` target uses `pytest` like `Taskfile.yml`.
+
+### Removed
+- Nix-related Taskfile targets (`nix-shell`, `nix-build`). Project environments use Poetry (and Docker where documented); Renovate and Flake-based tooling were dropped from the repo.
+- DeepSource configuration (`.deepsource.toml`) removed.
+
+### Added
+- `tests/test_handlers_unit.py` and `tests/test_config_unit.py`: unit coverage and Hypothesis-based checks for handlers and config loading.
+- `tests/test_path_security.py`: security-focused and fuzz tests for path handling (included in `tests/run_tests.sh`).
+
 ## [1.4.0] - 2026-01-15
 
 ### Added
