@@ -1,4 +1,4 @@
-"""Request handlers and response generation for rns-page-node."""
+"""HTTP-style request handlers for .mu pages and static files."""
 
 import os
 import subprocess
@@ -19,6 +19,22 @@ You are not authorised to carry out the request.
 """
 
 
+def _safe_file_in_root(root: Path, relative: str) -> Optional[Path]:
+    if "\x00" in relative:
+        return None
+    relative = relative.replace("\\", "/")
+    root = root.resolve()
+    try:
+        candidate = (root / relative).resolve()
+    except (OSError, ValueError):
+        return None
+    try:
+        candidate.relative_to(root)
+    except ValueError:
+        return None
+    return candidate
+
+
 def serve_default_index(
     _path: str,
     _data: Any,
@@ -27,7 +43,6 @@ def serve_default_index(
     _remote_identity: Any,
     _requested_at: float,
 ) -> bytes:
-    """Serve the default index page when no index.mu file exists."""
     return DEFAULT_INDEX.encode("utf-8")
 
 
@@ -40,12 +55,10 @@ def serve_page(
     _requested_at: float,
     pagespath: Path,
 ) -> bytes:
-    """Serve a .mu page file, executing it as a script if it has a shebang."""
     pagespath = pagespath.resolve()
     relative_path = path[6:] if path.startswith("/page/") else path[5:]
-    file_path = (pagespath / relative_path).resolve()
-
-    if not str(file_path).startswith(str(pagespath)):
+    file_path = _safe_file_in_root(pagespath, relative_path)
+    if file_path is None:
         return DEFAULT_NOTALLOWED.encode("utf-8")
 
     is_script = False
@@ -80,7 +93,7 @@ def serve_page(
                         e.startswith("field_") or e.startswith("var_")
                     ):
                         env_map[e] = data[e]
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(
                 [str(file_path)],
                 stdout=subprocess.PIPE,
                 check=True,
@@ -112,12 +125,10 @@ def serve_file(
     _requested_at: float,
     filespath: Path,
 ) -> Union[bytes, list[Any]]:
-    """Serve a file from the files directory."""
     filespath = filespath.resolve()
     relative_path = path[6:] if path.startswith("/file/") else path[5:]
-    file_path = (filespath / relative_path).resolve()
-
-    if not file_path.is_file() or not str(file_path).startswith(str(filespath)):
+    file_path = _safe_file_in_root(filespath, relative_path)
+    if file_path is None or not file_path.is_file():
         return DEFAULT_NOTALLOWED.encode("utf-8")
 
     try:
