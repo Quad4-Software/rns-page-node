@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="rns-page-node",
-    version="1.4.0",
+    version="1.5.0",
     description="A simple way to serve pages and files over the Reticulum network.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -10,8 +10,8 @@ setup(
     url="https://git.quad4.io/RNS-Things/rns-page-node",
     packages=find_packages(),
     install_requires=[
-        "rns>=1.1.4,<1.5.0",
-        "cryptography>=46.0.5,<47",
+        "rns>=1.1.6,<1.5.0",
+        "cryptography>=46.0.7,<47",
     ],
     entry_points={
         "console_scripts": [
