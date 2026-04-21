@@ -2,10 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.4.1] - 2026-04-08
+## [1.5.0] - 2026-04-20
 
 ### Dependencies
-- **Runtime**: `rns` `>=1.1.3,<1.5.0` (lock: 1.1.4); `cryptography` `>=46.0.5,<47` (lock: 46.0.7).
+- **Runtime**: `rns` `>=1.1.6,<1.5.0` (lock: 1.1.6); `cryptography` `>=46.0.7,<47` (lock: 46.0.7).
 - **Development**: `pytest` ^8.4 (lock: 8.4.2), `hypothesis` ^6.135 (lock: 6.141.1), `ruff` ^0.14.10 (lock: 0.14.14), `build` ^1.3 (lock: 1.4.2), `twine` ^6.2.0 (lock: 6.2.0). `pytest` configuration added under `[tool.pytest.ini_options]` in `pyproject.toml`.
 
 ### Security
