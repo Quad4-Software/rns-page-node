@@ -55,12 +55,12 @@ Sie können die Wheel-Datei direkt von der [neuesten Version](https://git.quad4.
 
 ```bash
 # Wget
-wget https://git.quad4.io/RNS-Things/rns-page-node/releases/download/v1.4.0/rns_page_node-1.4.0-py3-none-any.whl
-pip install rns_page_node-1.4.0-py3-none-any.whl
+wget https://git.quad4.io/RNS-Things/rns-page-node/releases/download/v1.5.0/rns_page_node-1.5.0-py3-none-any.whl
+pip install rns_page_node-1.5.0-py3-none-any.whl
 
 # Curl
-curl -O -L https://git.quad4.io/RNS-Things/rns-page-node/releases/download/v1.4.0/rns_page_node-1.4.0-py3-none-any.whl
-pip install rns_page_node-1.4.0-py3-none-any.whl
+curl -O -L https://git.quad4.io/RNS-Things/rns-page-node/releases/download/v1.5.0/rns_page_node-1.5.0-py3-none-any.whl
+pip install rns_page_node-1.5.0-py3-none-any.whl
 ```
 
 ```bash
