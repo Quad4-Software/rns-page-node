@@ -2,10 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.5.1] - 2026-04-25
+## [1.5.1] - 2026-04-30
 
 ### Dependencies
-- **Updated**: `rns` `>=1.1.9,<1.5.0`; `cryptography` `>=47.0.0,<48`.
+- **Updated**: `rns` `>=1.2.0,<1.5.0`; `cryptography` `>=47.0.0,<48`.
 
 ## [1.5.0] - 2026-04-20
 
