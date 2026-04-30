@@ -11,7 +11,7 @@ vars:
     sh: docker buildx version >/dev/null 2>&1 && echo "docker buildx build" || echo "docker build"
   DOCKER_BUILD_LOAD:
     sh: docker buildx version >/dev/null 2>&1 && echo "docker buildx build --load" || echo "docker build"
-  IMAGE_NAME: git.quad4.io/rns-things/rns-page-node
+  IMAGE_NAME: git.quad4.io/rns-things/page-node
 
 tasks:
   default:

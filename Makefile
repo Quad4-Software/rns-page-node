@@ -46,7 +46,7 @@ docker-wheels:
 	docker rm builder-container
 
 docker-build:
-	$(DOCKER_BUILD_LOAD) $(DOCKER_BUILD_ARGS) $(BUILD_ARGS) -f docker/Dockerfile -t git.quad4.io/rns-things/rns-page-node:latest -t git.quad4.io/rns-things/rns-page-node:$(VERSION) .
+	$(DOCKER_BUILD_LOAD) $(DOCKER_BUILD_ARGS) $(BUILD_ARGS) -f docker/Dockerfile -t git.quad4.io/rns-things/page-node:latest -t git.quad4.io/rns-things/page-node:$(VERSION) .
 
 docker-run: setup-dirs
 	docker run --rm -it \
@@ -54,7 +54,7 @@ docker-run: setup-dirs
 		-v ./files:/app/files \
 		-v ./node-config:/app/node-config \
 		-v ./reticulum-config:/home/app/.reticulum \
-		git.quad4.io/rns-things/rns-page-node:latest \
+		git.quad4.io/rns-things/page-node:latest \
 		--node-name "Page Node" \
 		--pages-dir /app/pages \
 		--files-dir /app/files \
