@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      GITEA_RELEASE_ACTION_SHA: b8d9144f302c68610911db1aaf722708d5c02d94
 
     steps:
     - name: Checkout
@@ -62,11 +64,18 @@ jobs:
       run: python3 -m twine upload dist/*.tar.gz dist/*.whl
       continue-on-error: true
 
+    - name: Fetch gitea-release-action (gitea.com, pinned)
+      run: |
+        set -eu
+        mkdir -p .github/actions/gitea-release-action
+        curl -fsSL "https://gitea.com/actions/gitea-release-action/archive/${GITEA_RELEASE_ACTION_SHA}.tar.gz" \
+          | tar -xz -C .github/actions/gitea-release-action --strip-components=1
+
     - name: Create Gitea Release with artifacts
-      uses: https://git.quad4.io/actions/gitea-release-action@4875285c0950474efb7ca2df55233c51333eeb74
+      uses: ./.github/actions/gitea-release-action
       with:
         server_url: ${{ github.server_url }}
-        repository: RNS-Things/page-node
+        repository: ${{ github.repository }}
         tag_name: ${{ inputs.version || github.ref_name }}
         name: Release ${{ inputs.version || github.ref_name }}
         body_path: release_notes.md
