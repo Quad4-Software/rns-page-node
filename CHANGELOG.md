@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [1.5.1] - 2026-04-30
 
+### Security
+- **Docker**: Install `pip>=26.1` in the builder venv, the runtime venv, and the base image Python so Trivy no longer flags CVE-2026-3219 (ambiguous tar/zip handling in pip before 26.1).
+
 ### Dependencies
 - **Updated**: `rns` `>=1.2.0,<1.5.0`; `cryptography` `>=47.0.0,<48`.
 
