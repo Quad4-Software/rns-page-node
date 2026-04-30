@@ -18,8 +18,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://git.quad4.io/RNS-Things/rns-page-node"
-Repository = "https://git.quad4.io/RNS-Things/rns-page-node"
+Homepage = "https://git.quad4.io/RNS-Things/page-node"
+Repository = "https://git.quad4.io/RNS-Things/page-node"
 
 [project.scripts]
 rns-page-node = "rns_page_node.main:main"

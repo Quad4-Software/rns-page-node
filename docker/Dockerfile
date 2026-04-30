@@ -31,9 +31,9 @@ ARG BUILD_DATE
 LABEL org.opencontainers.image.created=$BUILD_DATE \
       org.opencontainers.image.title="RNS Page Node" \
       org.opencontainers.image.description="A simple way to serve pages and files over the Reticulum network." \
-      org.opencontainers.image.url="https://git.quad4.io/RNS-Things/rns-page-node" \
-      org.opencontainers.image.documentation="https://git.quad4.io/RNS-Things/rns-page-node/src/branch/main/README.md" \
-      org.opencontainers.image.source="https://git.quad4.io/RNS-Things/rns-page-node" \
+      org.opencontainers.image.url="https://git.quad4.io/RNS-Things/page-node" \
+      org.opencontainers.image.documentation="https://git.quad4.io/RNS-Things/page-node/src/branch/main/README.md" \
+      org.opencontainers.image.source="https://git.quad4.io/RNS-Things/page-node" \
       org.opencontainers.image.version=$VERSION \
       org.opencontainers.image.revision=$VCS_REF \
       org.opencontainers.image.vendor="RNS-Things" \

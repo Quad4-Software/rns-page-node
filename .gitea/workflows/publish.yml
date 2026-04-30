@@ -65,6 +65,8 @@ jobs:
     - name: Create Gitea Release with artifacts
       uses: https://git.quad4.io/actions/gitea-release-action@4875285c0950474efb7ca2df55233c51333eeb74
       with:
+        server_url: ${{ github.server_url }}
+        repository: RNS-Things/page-node
         tag_name: ${{ inputs.version || github.ref_name }}
         name: Release ${{ inputs.version || github.ref_name }}
         body_path: release_notes.md

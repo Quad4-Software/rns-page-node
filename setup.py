@@ -7,7 +7,7 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author="Sudo-Ivan",
-    url="https://git.quad4.io/RNS-Things/rns-page-node",
+    url="https://git.quad4.io/RNS-Things/page-node",
     packages=find_packages(),
     install_requires=[
         "rns>=1.1.9,<1.5.0",
