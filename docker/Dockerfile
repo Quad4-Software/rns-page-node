@@ -18,7 +18,7 @@ COPY rns_page_node ./rns_page_node
 
 RUN poetry config virtualenvs.in-project true && \
     poetry install --no-interaction --no-ansi --only main && \
-    .venv/bin/pip install --upgrade 'pip>=26.0' && \
+    .venv/bin/pip install --upgrade 'pip>=26.1' && \
     poetry build --format wheel && \
     .venv/bin/pip install dist/*.whl
 
@@ -48,6 +48,9 @@ WORKDIR /app
 
 COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
+
+RUN python3 -m pip install --upgrade 'pip>=26.1' && \
+    /app/.venv/bin/python -m pip install --upgrade 'pip>=26.1'
 
 RUN mkdir -p pages files node-config && \
     chown -R app:app /app && \
