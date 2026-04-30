@@ -51,27 +51,31 @@ pipx install rns-page-node
 
 **Manueller Download (Neueste Version):**
 
-Sie können die Wheel-Datei direkt von der [neuesten Version](https://git.quad4.io/RNS-Things/rns-page-node/releases/latest) herunterladen und installieren:
+Laden Sie `rns_page_node-1.5.1-py3-none-any.whl` (Wheel) oder `rns_page_node-1.5.1.tar.gz` (Quelltext) von der [neuesten Version](https://git.quad4.io/RNS-Things/page-node/releases/latest) herunter und installieren Sie sie:
 
 ```bash
-# Wget
-wget https://git.quad4.io/RNS-Things/rns-page-node/releases/download/v1.5.0/rns_page_node-1.5.0-py3-none-any.whl
-pip install rns_page_node-1.5.0-py3-none-any.whl
+# Wheel (wget)
+wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
+pip install rns_page_node-1.5.1-py3-none-any.whl
 
-# Curl
-curl -O -L https://git.quad4.io/RNS-Things/rns-page-node/releases/download/v1.5.0/rns_page_node-1.5.0-py3-none-any.whl
-pip install rns_page_node-1.5.0-py3-none-any.whl
+# Wheel (curl)
+curl -O -L https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
+pip install rns_page_node-1.5.1-py3-none-any.whl
+
+# Quelltext-Archiv (wget)
+wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1.tar.gz
+pip install rns_page_node-1.5.1.tar.gz
 ```
 
 ```bash
 # Pip
-pip install git+https://git.quad4.io/RNS-Things/rns-page-node.git --break-system-packages
+pip install git+https://git.quad4.io/RNS-Things/page-node.git --break-system-packages
 # Pipx (Git)
-pipx install git+https://git.quad4.io/RNS-Things/rns-page-node.git
+pipx install git+https://git.quad4.io/RNS-Things/page-node.git
 # UV
 uv venv
 source .venv/bin/activate
-uv pip install git+https://git.quad4.io/RNS-Things/rns-page-node.git
+uv pip install git+https://git.quad4.io/RNS-Things/page-node.git
 ```
 
 ## Verwendung
@@ -113,7 +117,7 @@ Prioritätsreihenfolge: Befehlszeilenargumente > Konfigurationsdatei > Standardw
 ### Docker/Podman
 
 ```bash
-docker run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/rns-page-node:latest
+docker run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
 ```
 
 ### Docker/Podman Rootless (ohne Root)
@@ -121,7 +125,7 @@ docker run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config
 ```bash
 mkdir -p ./pages ./files ./node-config ./reticulum-config
 chown -R 1000:1000 ./pages ./files ./node-config ./reticulum-config
-podman run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/rns-page-node:latest
+podman run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
 ```
 
 Das Einbinden von Volumes ist optional, Sie können Seiten und Dateien auch mit `podman cp` oder `docker cp` in den Container kopieren.
