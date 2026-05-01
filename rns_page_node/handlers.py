@@ -18,12 +18,35 @@ DEFAULT_NOTALLOWED = """>Request Not Allowed
 You are not authorised to carry out the request.
 """
 
+DEFAULT_INDEX_BYTES = DEFAULT_INDEX.encode("utf-8")
+DEFAULT_NOTALLOWED_BYTES = DEFAULT_NOTALLOWED.encode("utf-8")
+
+
+def _relative_under_route(path: str, prefix_with_slash: str) -> str:
+    n = len(prefix_with_slash)
+    return path[n:] if path.startswith(prefix_with_slash) else path[n - 1 :]
+
 
 def _safe_file_in_root(root: Path, relative: str) -> Optional[Path]:
     if "\x00" in relative:
         return None
     relative = relative.replace("\\", "/")
     root = root.resolve()
+    try:
+        candidate = (root / relative).resolve()
+    except (OSError, ValueError):
+        return None
+    try:
+        candidate.relative_to(root)
+    except ValueError:
+        return None
+    return candidate
+
+
+def _safe_join_resolved_root(root: Path, relative: str) -> Optional[Path]:
+    if "\x00" in relative:
+        return None
+    relative = relative.replace("\\", "/")
     try:
         candidate = (root / relative).resolve()
     except (OSError, ValueError):
@@ -43,7 +66,7 @@ def serve_default_index(
     _remote_identity: Any,
     _requested_at: float,
 ) -> bytes:
-    return DEFAULT_INDEX.encode("utf-8")
+    return DEFAULT_INDEX_BYTES
 
 
 def serve_page(
@@ -55,11 +78,10 @@ def serve_page(
     _requested_at: float,
     pagespath: Path,
 ) -> bytes:
-    pagespath = pagespath.resolve()
-    relative_path = path[6:] if path.startswith("/page/") else path[5:]
-    file_path = _safe_file_in_root(pagespath, relative_path)
+    relative_path = _relative_under_route(path, "/page/")
+    file_path = _safe_join_resolved_root(pagespath, relative_path)
     if file_path is None:
-        return DEFAULT_NOTALLOWED.encode("utf-8")
+        return DEFAULT_NOTALLOWED_BYTES
 
     is_script = False
     file_content: Optional[bytes] = None
@@ -72,10 +94,10 @@ def serve_page(
                 return file_handle.read()
             file_content = file_handle.read()
     except FileNotFoundError:
-        return DEFAULT_NOTALLOWED.encode("utf-8")
+        return DEFAULT_NOTALLOWED_BYTES
     except OSError as err:
         RNS.log(f"Error reading page {file_path}: {err}", RNS.LOG_ERROR)
-        return DEFAULT_NOTALLOWED.encode("utf-8")
+        return DEFAULT_NOTALLOWED_BYTES
 
     if is_script and os.access(str(file_path), os.X_OK):
         try:
@@ -88,11 +110,11 @@ def serve_page(
                     delimit=False,
                 )
             if data is not None and isinstance(data, dict):
-                for e in data:
-                    if isinstance(e, str) and (
-                        e.startswith("field_") or e.startswith("var_")
+                for k, v in data.items():
+                    if isinstance(k, str) and (
+                        k.startswith("field_") or k.startswith("var_")
                     ):
-                        env_map[e] = data[e]
+                        env_map[k] = v
             result = subprocess.run(
                 [str(file_path)],
                 stdout=subprocess.PIPE,
@@ -110,10 +132,10 @@ def serve_page(
         with file_path.open("rb") as file_handle:
             return file_handle.read()
     except FileNotFoundError:
-        return DEFAULT_NOTALLOWED.encode("utf-8")
+        return DEFAULT_NOTALLOWED_BYTES
     except OSError as err:
         RNS.log(f"Error reading page fallback {file_path}: {err}", RNS.LOG_ERROR)
-        return DEFAULT_NOTALLOWED.encode("utf-8")
+        return DEFAULT_NOTALLOWED_BYTES
 
 
 def serve_file(
@@ -125,11 +147,10 @@ def serve_file(
     _requested_at: float,
     filespath: Path,
 ) -> Union[bytes, list[Any]]:
-    filespath = filespath.resolve()
-    relative_path = path[6:] if path.startswith("/file/") else path[5:]
-    file_path = _safe_file_in_root(filespath, relative_path)
+    relative_path = _relative_under_route(path, "/file/")
+    file_path = _safe_join_resolved_root(filespath, relative_path)
     if file_path is None or not file_path.is_file():
-        return DEFAULT_NOTALLOWED.encode("utf-8")
+        return DEFAULT_NOTALLOWED_BYTES
 
     try:
         return [
@@ -138,4 +159,4 @@ def serve_file(
         ]
     except OSError as err:
         RNS.log(f"Error opening file {file_path}: {err}", RNS.LOG_ERROR)
-        return DEFAULT_NOTALLOWED.encode("utf-8")
+        return DEFAULT_NOTALLOWED_BYTES

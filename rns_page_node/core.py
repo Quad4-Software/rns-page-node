@@ -44,6 +44,9 @@ class PageNode:
         self.last_file_refresh = time.time()
         self.servedpages: List[str] = []
         self.servedfiles: List[str] = []
+        self._announce_app_data: Optional[bytes] = (
+            name.encode("utf-8") if name else None
+        )
 
         self.register_pages()
         self.register_files()
@@ -74,7 +77,7 @@ class PageNode:
             link_id,
             remote_identity,
             requested_at,
-            self.pagespath,
+            self._pages_root,
         )
 
     def serve_file(
@@ -93,7 +96,7 @@ class PageNode:
             link_id,
             remote_identity,
             requested_at,
-            self.filespath,
+            self._files_root,
         )
 
     def register_pages(self) -> None:
@@ -103,6 +106,7 @@ class PageNode:
             self.servedpages = pages
 
         pages_path_obj = self.pagespath.resolve()
+        self._pages_root = pages_path_obj
 
         if not (pages_path_obj / "index.mu").is_file():
             self.destination.register_request_handler(
@@ -131,6 +135,7 @@ class PageNode:
             self.servedfiles = files
 
         files_path_obj = self.filespath.resolve()
+        self._files_root = files_path_obj
 
         for full_path in files:
             file_path = Path(full_path).resolve()
@@ -152,13 +157,25 @@ class PageNode:
         if not base.exists():
             return []
         served: List[str] = []
-        for entry in base.iterdir():
-            if entry.name.startswith("."):
+        stack: List[Path] = [base]
+        while stack:
+            current = stack.pop()
+            try:
+                entries = current.iterdir()
+            except OSError:
                 continue
-            if entry.is_dir():
-                served.extend(self._scan_pages(entry))
-            elif entry.is_file() and entry.name.endswith(".mu"):
-                served.append(str(entry))
+            for entry in entries:
+                name = entry.name
+                if name.startswith("."):
+                    continue
+                try:
+                    is_dir = entry.is_dir()
+                except OSError:
+                    continue
+                if is_dir:
+                    stack.append(entry)
+                elif entry.is_file() and name.endswith(".mu"):
+                    served.append(str(entry))
         return served
 
     def _scan_files(self, base: Union[Path, str]) -> List[str]:
@@ -167,13 +184,25 @@ class PageNode:
         if not base.exists():
             return []
         served: List[str] = []
-        for entry in base.iterdir():
-            if entry.name.startswith("."):
+        stack: List[Path] = [base]
+        while stack:
+            current = stack.pop()
+            try:
+                entries = current.iterdir()
+            except OSError:
                 continue
-            if entry.is_dir():
-                served.extend(self._scan_files(entry))
-            elif entry.is_file():
-                served.append(str(entry))
+            for entry in entries:
+                name = entry.name
+                if name.startswith("."):
+                    continue
+                try:
+                    is_dir = entry.is_dir()
+                except OSError:
+                    continue
+                if is_dir:
+                    stack.append(entry)
+                elif entry.is_file():
+                    served.append(str(entry))
         return served
 
     def on_connect(self, _link: Any) -> None:
@@ -189,9 +218,9 @@ class PageNode:
                     or now - self.last_announce >= interval_seconds
                 ):
                     try:
-                        if self.name:
+                        if self._announce_app_data is not None:
                             self.destination.announce(
-                                app_data=self.name.encode("utf-8"),
+                                app_data=self._announce_app_data,
                             )
                         else:
                             self.destination.announce()
@@ -228,25 +257,22 @@ class PageNode:
                     self.register_files()
                     self.last_file_refresh = time.time()
 
-                wait_candidates: List[float] = []
+                wait_time = 1.0
                 if self.page_refresh_interval > 0:
-                    wait_candidates.append(
-                        max(
-                            (self.last_page_refresh + self.page_refresh_interval)
-                            - time.time(),
-                            0.5,
-                        ),
+                    wait_time = max(
+                        (self.last_page_refresh + self.page_refresh_interval)
+                        - time.time(),
+                        0.5,
                     )
                 if self.file_refresh_interval > 0:
-                    wait_candidates.append(
-                        max(
-                            (self.last_file_refresh + self.file_refresh_interval)
-                            - time.time(),
-                            0.5,
-                        ),
+                    t = max(
+                        (self.last_file_refresh + self.file_refresh_interval)
+                        - time.time(),
+                        0.5,
                     )
-
-                wait_time = min(wait_candidates) if wait_candidates else 1.0
+                    wait_time = (
+                        t if self.page_refresh_interval <= 0 else min(wait_time, t)
+                    )
                 self._stop_event.wait(min(wait_time, 60))
         except Exception as e:
             RNS.log(f"Error in refresh loop: {e}", RNS.LOG_ERROR)

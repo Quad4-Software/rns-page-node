@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from rns_page_node.handlers import (
-    DEFAULT_NOTALLOWED,
+    DEFAULT_NOTALLOWED_BYTES,
     _safe_file_in_root,
     serve_file,
     serve_page,
@@ -52,7 +52,7 @@ def test_serve_page_traversal(tmp_path: Path) -> None:
         0.0,
         tmp_path,
     )
-    assert DEFAULT_NOTALLOWED.encode("utf-8") == bad
+    assert bad == DEFAULT_NOTALLOWED_BYTES
 
 
 def test_serve_file_opens_under_root(tmp_path: Path) -> None:
@@ -89,4 +89,4 @@ def test_serve_file_rejects_escape(tmp_path: Path) -> None:
         0.0,
         tmp_path,
     )
-    assert res == DEFAULT_NOTALLOWED.encode("utf-8")
+    assert res == DEFAULT_NOTALLOWED_BYTES

@@ -9,13 +9,13 @@ from hypothesis import strategies as st
 from hypothesis.strategies import composite
 
 from rns_page_node.handlers import (
-    DEFAULT_NOTALLOWED,
+    DEFAULT_NOTALLOWED_BYTES,
     _safe_file_in_root,
     serve_file,
     serve_page,
 )
 
-DENY = DEFAULT_NOTALLOWED.encode("utf-8")
+DENY = DEFAULT_NOTALLOWED_BYTES
 OUTSIDE_MARKER = b"OUTSIDE_ONLY_SECRET_MARKER_7f3a"
 
 
