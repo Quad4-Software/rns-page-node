@@ -4,6 +4,7 @@
 
 Un modo semplice per servire pagine e file sulla [rete Reticulum](https://reticulum.network/). Sostituto drop-in per i nodi [NomadNet](https://github.com/markqvist/NomadNet) che servono principalmente pagine e file.
 
+Questo progetto non viene più aggiornato, ma è configurato per usare RNS >= `1.3.4` e userà sempre l'ultimo stack di rete compatibile.
 ## Caratteristiche
 
 - Serve pagine e file su RNS
@@ -20,62 +21,11 @@ pip install rns-page-node
 pipx install rns-page-node
 ```
 
-### Da Gitea Packages
+### Da GitHub (sorgente)
 
 ```bash
-# Pip
-pip install --index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple rns-page-node
-
-# Pipx
-pipx install --pip-args "--index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple" rns-page-node
-```
-
-**Configurazione permanente (Opzionale):**
-
-Per evitare di digitare ogni volta gli URL degli indici, aggiungili al tuo `pip.conf`:
-
-```ini
-# ~/.config/pip/pip.conf
-[global]
-index-url = https://git.quad4.io/api/packages/RNS-Things/pypi/simple/
-extra-index-url = https://pypi.org/simple
-```
-
-Quindi puoi semplicemente usare:
-
-```bash
-pip install rns-page-node
-# o
-pipx install rns-page-node
-```
-
-**Download manuale (Ultima versione):**
-
-Scaricate `rns_page_node-1.5.1-py3-none-any.whl` (wheel) o `rns_page_node-1.5.1.tar.gz` (sorgente) dall'[ultima versione](https://git.quad4.io/RNS-Things/page-node/releases/latest).
-
-```bash
-# Wheel (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# Wheel (curl)
-curl -O -L https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# Archivio sorgente (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1.tar.gz
-pip install rns_page_node-1.5.1.tar.gz
-```
-
-```bash
-# Pip
-pip install git+https://git.quad4.io/RNS-Things/page-node.git --break-system-packages
-# Pipx (Git)
-pipx install git+https://git.quad4.io/RNS-Things/page-node.git
-# UV
-uv venv
-source .venv/bin/activate
-uv pip install git+https://git.quad4.io/RNS-Things/page-node.git
+pip install git+https://github.com/Quad4-Software/rns-page-node.git
+pipx install git+https://github.com/Quad4-Software/rns-page-node.git
 ```
 
 ## Utilizzo
@@ -114,22 +64,6 @@ announce-interval=360
 
 Ordine di priorità: Argomenti della riga di comando > File di configurazione > Predefiniti
 
-### Docker/Podman
-
-```bash
-docker run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-### Docker/Podman Rootless
-
-```bash
-mkdir -p ./pages ./files ./node-config ./reticulum-config
-chown -R 1000:1000 ./pages ./files ./node-config ./reticulum-config
-podman run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-Il montaggio dei volumi è opzionale, è anche possibile copiare pagine e file nel container con `podman cp` o `docker cp`.
-
 ## Compilazione
 
 ```bash
@@ -140,12 +74,6 @@ Costruire le Wheels:
 
 ```bash
 make wheel
-```
-
-### Costruire le Wheels in Docker
-
-```bash
-make docker-wheels
 ```
 
 ## Sviluppo

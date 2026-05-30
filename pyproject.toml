@@ -1,16 +1,15 @@
 [project]
 name = "rns-page-node"
-version = "1.5.1"
+version = "1.6.0"
 license = "GPL-3.0-only"
 description = "A simple way to serve pages and files over the Reticulum network."
 authors = [
-    {name = "Sudo-Ivan"}
+    {name = "Ivan"}
 ]
 readme = "README.md"
 requires-python = ">=3.9.2"
 dependencies = [
-    "rns (>=1.2.0,<1.5.0)",
-    "cryptography>=47.0.0,<48",
+    "rns>=1.3.4",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -18,21 +17,21 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://git.quad4.io/RNS-Things/page-node"
-Repository = "https://git.quad4.io/RNS-Things/page-node"
+Homepage = "https://github.com/Quad4-Software/rns-page-node"
+Repository = "https://github.com/Quad4-Software/rns-page-node"
 
 [project.scripts]
 rns-page-node = "rns_page_node.main:main"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=2.2.1,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
-build = "^1.3.0"
-hypothesis = "^6.135.0"
-pytest = "^8.4.0"
-ruff = "^0.14.10"
+build = "^1.4.4"
+hypothesis = "^6.141.1"
+pytest = "^8.4.2"
+ruff = "^0.15.15"
 twine = "^6.2.0"
 
 [tool.pytest.ini_options]

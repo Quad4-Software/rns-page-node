@@ -1,11 +1,12 @@
 pages/
 node-config/
 files/
-.ruff_cache/
 __pycache__/
-dist/
-*.egg-info/
 .ruff_cache/
+.pytest_cache/
+dist/
+build/
+*.egg-info/
 .venv/
 .env
 .env.local
@@ -13,3 +14,4 @@ dist/
 .env.test.local
 .env.production.local
 .hypothesis/
+build/

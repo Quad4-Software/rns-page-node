@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-05-30 - **Final Release**
+
+This project will no longer be updated, but is configured to use RNS >= `1.3.4` so it will always use the latest compatible stack.
+
+### Changed
+- **Dependencies**: `rns>=1.3.4` (open lower bound in `pyproject.toml`, `requirements.txt`, and setuptools metadata via `setup.py` shim).
+- **Python**: Minimum version remains `>=3.9.2`; dev tooling capped to versions that support 3.9 (`pytest` 8.x, `build` 1.4.x, `hypothesis` 6.141.x).
+- **Documentation**: `README.md` and translations updated for final maintenance mode; Docker install/build sections removed.
+- **Makefile**: Docker targets removed; [rngit](https://github.com/markqvist/Reticulum) release targets added (`release`, `release-upload`, `release-fetch`, etc., matching LXMFy workflow).
+- **Taskfile**: Docker tasks removed to match dropped container support.
+
+### Removed
+- Docker support (`docker/`, images, and all `make docker-*` / Taskfile docker tasks) as no longer maintained.
+
 ## [1.5.1] - 2026-04-30
 
 ### Security

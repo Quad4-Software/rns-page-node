@@ -4,6 +4,7 @@
 
 [Reticulum ネットワーク](https://reticulum.network/)を介してページやファイルを提供するためのシンプルな方法です。主にページやファイルを提供する [NomadNet](https://github.com/markqvist/NomadNet) ノードのドロップイン代替品です。
 
+このプロジェクトは更新されませんが、RNS >= `1.3.4` を使用するよう設定されているため、常に最新の互換ネットワークスタックを使用します。
 ## 特徴
 
 - RNS を介したページおよびファイルの提供
@@ -20,62 +21,11 @@ pip install rns-page-node
 pipx install rns-page-node
 ```
 
-### Gitea Packages から
+### GitHub から（ソース）
 
 ```bash
-# Pip
-pip install --index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple rns-page-node
-
-# Pipx
-pipx install --pip-args "--index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple" rns-page-node
-```
-
-**永続的な設定 (オプション):**
-
-毎回インデックス URL を入力しなくて済むように、`pip.conf` に追加します。
-
-```ini
-# ~/.config/pip/pip.conf
-[global]
-index-url = https://git.quad4.io/api/packages/RNS-Things/pypi/simple/
-extra-index-url = https://pypi.org/simple
-```
-
-その後は、単に以下を使用できます。
-
-```bash
-pip install rns-page-node
-# または
-pipx install rns-page-node
-```
-
-**手動ダウンロード (最新リリース):**
-
-[最新リリース](https://git.quad4.io/RNS-Things/page-node/releases/latest)から `rns_page_node-1.5.1-py3-none-any.whl`（wheel）または `rns_page_node-1.5.1.tar.gz`（ソース）をダウンロードしてインストールできます。
-
-```bash
-# Wheel (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# Wheel (curl)
-curl -O -L https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# ソース tarball (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1.tar.gz
-pip install rns_page_node-1.5.1.tar.gz
-```
-
-```bash
-# Pip
-pip install git+https://git.quad4.io/RNS-Things/page-node.git --break-system-packages
-# Pipx（Git）
-pipx install git+https://git.quad4.io/RNS-Things/page-node.git
-# UV
-uv venv
-source .venv/bin/activate
-uv pip install git+https://git.quad4.io/RNS-Things/page-node.git
+pip install git+https://github.com/Quad4-Software/rns-page-node.git
+pipx install git+https://github.com/Quad4-Software/rns-page-node.git
 ```
 
 ## 使用法
@@ -114,22 +64,6 @@ announce-interval=360
 
 優先順位：コマンドライン引数 > 設定ファイル > デフォルト
 
-### Docker/Podman
-
-```bash
-docker run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-### Docker/Podman ルートレス (Rootless)
-
-```bash
-mkdir -p ./pages ./files ./node-config ./reticulum-config
-chown -R 1000:1000 ./pages ./files ./node-config ./reticulum-config
-podman run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-ボリュームのマウントはオプションです。`podman cp` または `docker cp` を使用してページやファイルをコンテナにコピーすることもできます。
-
 ## ビルド
 
 ```bash
@@ -140,12 +74,6 @@ Wheels のビルド：
 
 ```bash
 make wheel
-```
-
-### Docker での Wheels のビルド
-
-```bash
-make docker-wheels
 ```
 
 ## 開発

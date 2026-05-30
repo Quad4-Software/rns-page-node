@@ -2,11 +2,15 @@
 
 [Русский](docs/languages/README.ru.md) | [中文](docs/languages/README.zh.md) | [日本語](docs/languages/README.ja.md) | [Italiano](docs/languages/README.it.md) | [Deutsch](docs/languages/README.de.md)
 
-A simple way to serve pages and files over the [Reticulum network](https://reticulum.network/). Drop-in replacement for [NomadNet](https://github.com/markqvist/NomadNet) nodes that primarily serve pages and files.
+A simple way to serve simple pages and files over the [Reticulum network](https://reticulum.network/). Drop-in replacement for [NomadNet](https://github.com/markqvist/NomadNet) nodes that primarily serve pages and files. For more advanced pages and setups you should use NomadNet.
+
+This project is no longer being updated, but it is configured to use RNS >= `1.3.4` so it will always use the latest compatible network stack.
+
+**Source:** [GitHub](https://github.com/Quad4-Software/rns-page-node) (code mirror). **Releases:** [PyPI](https://pypi.org/project/rns-page-node/) and signed artifacts on Reticulum via [rngit](https://github.com/markqvist/Reticulum) (`origin` RNS remote).
 
 ## Features
 
-- Serves pages and files over RNS
+- Serves simple pages and files over RNS
 - Dynamic page support with environment variables
 - Form data and request parameter parsing
 
@@ -20,62 +24,21 @@ pip install rns-page-node
 pipx install rns-page-node
 ```
 
-### From Gitea Packages
+### From GitHub (source)
 
 ```bash
-# Pip
-pip install --index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple rns-page-node
-
-# Pipx
-pipx install --pip-args "--index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple" rns-page-node
-```
-
-**Permanent Configuration for Gitea (Optional):**
-
-To avoid typing the index URLs every time when using the Gitea registry, add them to your `pip.conf`:
-
-```ini
-# ~/.config/pip/pip.conf
-[global]
-index-url = https://git.quad4.io/api/packages/RNS-Things/pypi/simple/
-extra-index-url = https://pypi.org/simple
-```
-
-Then you can simply use:
-
-```bash
-pip install rns-page-node
+pip install git+https://github.com/Quad4-Software/rns-page-node.git
 # or
-pipx install rns-page-node
+pipx install git+https://github.com/Quad4-Software/rns-page-node.git
 ```
 
-**Manual Download (Latest Release):**
+### From an rngit release
 
-Download `rns_page_node-1.5.1-py3-none-any.whl` (wheel) or `rns_page_node-1.5.1.tar.gz` (source) from the [latest release](https://git.quad4.io/RNS-Things/page-node/releases/latest).
-
-```bash
-# Wheel (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# Wheel (curl)
-curl -O -L https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# Source tarball (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1.tar.gz
-pip install rns_page_node-1.5.1.tar.gz
-```
+If you use Reticulum and have [rngit](https://github.com/markqvist/Reticulum) configured, fetch a release from the project RNS remote (same URL as `git remote get-url origin` when using RNS):
 
 ```bash
-# Pip
-pip install git+https://git.quad4.io/RNS-Things/page-node.git --break-system-packages
-# Pipx via Git
-pipx install git+https://git.quad4.io/RNS-Things/page-node.git
-# UV
-uv venv
-source .venv/bin/activate
-uv pip install git+https://git.quad4.io/RNS-Things/page-node.git
+rngit release fetch v1.6.0:all
+pip install dist/rns_page_node-*.whl
 ```
 
 ## Usage
@@ -114,38 +77,16 @@ announce-interval=360
 
 Priority order: Command-line arguments > Config file > Defaults
 
-### Docker/Podman
-
-```bash
-docker run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-### Docker/Podman Rootless
-
-```bash
-mkdir -p ./pages ./files ./node-config ./reticulum-config
-chown -R 1000:1000 ./pages ./files ./node-config ./reticulum-config
-podman run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-Mounting volumes are optional, you can also copy pages and files to the container `podman cp` or `docker cp`.
-
 ## Build
 
 ```bash
 make build
 ```
 
-Build wheels:
+Build wheels only:
 
 ```bash
 make wheel
-```
-
-### Build Wheels in Docker
-
-```bash
-make docker-wheels
 ```
 
 ## Development
@@ -153,10 +94,23 @@ make docker-wheels
 ```bash
 poetry install
 bash tests/run_tests.sh
-ruff check .
+make lint
 ```
 
 `make test` runs the same script as `tests/run_tests.sh`.
+
+## Releases
+
+Distribution is **PyPI** plus **rngit** (Reticulum). Pushing tags/commits uses `origin`, which mirrors code to GitHub and the RNS remote.
+
+```bash
+make release-dist          # build dist/
+make release               # tag, push (GitHub + RNS), upload rngit release
+make release-local         # rngit release on local remote only
+make publish               # upload wheels to PyPI
+```
+
+Other targets: `release-list`, `release-view`, `release-fetch`, `release-verify`, `release-delete`. Override `RELEASE_TAG`, `RNGIT_REMOTE`, `RNGIT_IDENTITY`, or `RNGIT_SIGNER` as needed.
 
 ## Pages
 

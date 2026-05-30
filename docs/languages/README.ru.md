@@ -4,6 +4,10 @@
 
 Простой способ для раздачи страниц и файлов через сеть [Reticulum](https://reticulum.network/). Прямая замена для узлов [NomadNet](https://github.com/markqvist/NomadNet), которые в основном служат для раздачи страниц и файлов.
 
+Этот проект больше не обновляется, но настроен на RNS >= `1.3.4` и будет использовать последний совместимый сетевой стек.
+
+**Исходники:** [GitHub](https://github.com/Quad4-Software/rns-page-node) (зеркало кода). **Релизы:** [PyPI](https://pypi.org/project/rns-page-node/) и подписанные артефакты через Reticulum/rngit.
+
 ## Особенности
 
 - Раздача страниц и файлов через RNS
@@ -20,62 +24,11 @@ pip install rns-page-node
 pipx install rns-page-node
 ```
 
-### Из Gitea Packages
+### С GitHub (исходники)
 
 ```bash
-# Pip
-pip install --index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple rns-page-node
-
-# Pipx
-pipx install --pip-args "--index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple" rns-page-node
-```
-
-**Постоянная конфигурация (опционально):**
-
-Чтобы не вводить URL-адреса индексов каждый раз, добавьте их в свой `pip.conf`:
-
-```ini
-# ~/.config/pip/pip.conf
-[global]
-index-url = https://git.quad4.io/api/packages/RNS-Things/pypi/simple/
-extra-index-url = https://pypi.org/simple
-```
-
-Затем вы сможете просто использовать:
-
-```bash
-pip install rns-page-node
-# или
-pipx install rns-page-node
-```
-
-**Ручная загрузка (Последний релиз):**
-
-Скачайте `rns_page_node-1.5.1-py3-none-any.whl` (wheel) или `rns_page_node-1.5.1.tar.gz` (исходники) из [последнего релиза](https://git.quad4.io/RNS-Things/page-node/releases/latest).
-
-```bash
-# Wheel (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# Wheel (curl)
-curl -O -L https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# Архив исходников (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1.tar.gz
-pip install rns_page_node-1.5.1.tar.gz
-```
-
-```bash
-# Pip
-pip install git+https://git.quad4.io/RNS-Things/page-node.git --break-system-packages
-# Pipx (Git)
-pipx install git+https://git.quad4.io/RNS-Things/page-node.git
-# UV
-uv venv
-source .venv/bin/activate
-uv pip install git+https://git.quad4.io/RNS-Things/page-node.git
+pip install git+https://github.com/Quad4-Software/rns-page-node.git
+pipx install git+https://github.com/Quad4-Software/rns-page-node.git
 ```
 
 ## Использование
@@ -111,20 +64,6 @@ announce-interval=360
 
 Порядок приоритета: Аргументы командной строки > Файл конфигурации > Значения по умолчанию
 
-### Docker/Podman
-```bash
-docker run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-### Docker/Podman без root-доступа
-```bash
-mkdir -p ./pages ./files ./node-config ./reticulum-config
-chown -R 1000:1000 ./pages ./files ./node-config ./reticulum-config
-podman run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-Монтирование томов необязательно, вы также можете скопировать страницы и файлы в контейнер с помощью `podman cp` или `docker cp`.
-
 ## Сборка
 ```bash
 make build
@@ -133,11 +72,6 @@ make build
 Сборка wheels:
 ```bash
 make wheel
-```
-
-### Сборка Wheels в Docker
-```bash
-make docker-wheels
 ```
 
 ## Разработка

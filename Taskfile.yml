@@ -5,13 +5,14 @@ vars:
     sh: grep "^version =" pyproject.toml | cut -d '"' -f 2
   VCS_REF:
     sh: git rev-parse --short HEAD 2>/dev/null || echo "unknown"
-  BUILD_DATE:
-    sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
-  DOCKER_BUILD:
-    sh: docker buildx version >/dev/null 2>&1 && echo "docker buildx build" || echo "docker build"
-  DOCKER_BUILD_LOAD:
-    sh: docker buildx version >/dev/null 2>&1 && echo "docker buildx build --load" || echo "docker build"
-  IMAGE_NAME: git.quad4.io/rns-things/page-node
+  RNGIT: rngit
+  RNGIT_CONFIG: '{{.HOME}}/.rngit'
+  RNS_CONFIG: '{{.HOME}}/.reticulum'
+  RNGIT_REMOTE:
+    sh: git config --get remote.origin.url
+  RELEASE_TAG:
+    sh: echo v$(poetry version -s 2>/dev/null || grep '^version =' pyproject.toml | cut -d '"' -f 2)
+  RELEASE_DIST: dist
 
 tasks:
   default:
@@ -38,7 +39,7 @@ tasks:
   clean:
     desc: Remove build artifacts
     cmds:
-      - rm -rf build dist *.egg-info
+      - rm -rf build dist *.egg-info .pytest_cache
 
   install:
     desc: Install built wheel
@@ -49,20 +50,20 @@ tasks:
   install-dev:
     desc: Install package in development mode
     cmds:
-      - pip install -e .
+      - poetry install
 
   lint:
     desc: Run ruff linter
     cmds:
-      - ruff check .
+      - poetry run ruff check .
 
   format:
-    desc: Run ruff formatter with auto-fix
+    desc: Run ruff with auto-fix
     cmds:
-      - ruff check --fix .
+      - poetry run ruff check --fix .
 
   check:
-    desc: Run all code quality checks
+    desc: Run code quality checks
     deps: [lint]
 
   test:
@@ -71,59 +72,9 @@ tasks:
       - bash tests/run_tests.sh
 
   test-advanced:
-    desc: Run advanced tests (smoke, performance, leak, fuzzing, property-based)
+    desc: Run advanced tests via pytest
     cmds:
       - poetry run pytest tests/test_advanced.py
-
-  docker-wheels:
-    desc: Build Python wheels in Docker
-    cmds:
-      - '{{.DOCKER_BUILD}} --target builder -f docker/Dockerfile -t rns-page-node-builder .'
-      - docker create --name builder-container rns-page-node-builder true
-      - docker cp builder-container:/app/dist ./dist
-      - docker rm builder-container
-
-  docker-build:
-    desc: Build runtime Docker image
-    cmds:
-      - >
-        {{.DOCKER_BUILD_LOAD}}
-        --build-arg VERSION={{.VERSION}}
-        --build-arg VCS_REF={{.VCS_REF}}
-        --build-arg BUILD_DATE={{.BUILD_DATE}}
-        -f docker/Dockerfile
-        -t {{.IMAGE_NAME}}:latest
-        -t {{.IMAGE_NAME}}:{{.VERSION}}
-        .
-
-  docker-run:
-    desc: Run runtime Docker image
-    deps: [setup-dirs]
-    cmds:
-      - >
-        docker run --rm -it
-        -v ./pages:/app/pages
-        -v ./files:/app/files
-        -v ./node-config:/app/node-config
-        -v ./reticulum-config:/home/app/.reticulum
-        {{.IMAGE_NAME}}:latest
-        --node-name "Page Node"
-        --pages-dir /app/pages
-        --files-dir /app/files
-        --identity-dir /app/node-config
-        --announce-interval 360
-
-  docker-test:
-    desc: Build and run integration tests in Docker
-    cmds:
-      - '{{.DOCKER_BUILD_LOAD}} -f docker/Dockerfile.tests -t rns-page-node-tests .'
-      - docker run --rm rns-page-node-tests
-
-  docker-clean:
-    desc: Remove Docker images and containers
-    cmds:
-      - docker rmi {{.IMAGE_NAME}}:latest {{.IMAGE_NAME}}:{{.VERSION}} 2>/dev/null || true
-      - docker rmi rns-page-node-builder rns-page-node-tests 2>/dev/null || true
 
   run:
     desc: Run rns-page-node locally
@@ -131,47 +82,18 @@ tasks:
       - poetry run python3 -m rns_page_node.main
 
   run-dev:
-    desc: Run rns-page-node with development settings
+    desc: Run rns-page-node with DEBUG logging
     cmds:
       - poetry run python3 -m rns_page_node.main --log-level DEBUG
-
-  venv:
-    desc: Create Python virtual environment
-    cmds:
-      - python3 -m venv .venv
-      - 'echo "Virtual environment created. Activate with: source .venv/bin/activate"'
-
-  deps-install:
-    desc: Install dependencies using pip
-    cmds:
-      - pip install -r requirements.txt || pip install -e .
-
-  deps-update:
-    desc: Update dependencies
-    cmds:
-      - pip install --upgrade -r requirements.txt || pip install --upgrade -e .
 
   version:
     desc: Show current version
     cmds:
       - 'echo "Version: {{.VERSION}}"'
-      - 'echo "VCS Ref: {{.VCS_REF}}"'
-      - 'echo "Build Date: {{.BUILD_DATE}}"'
-
-  setup-dirs:
-    desc: Create required directories for running the node
-    cmds:
-      - mkdir -p pages files node-config reticulum-config
 
   all:
-    desc: Run build, lint, and test
-    deps: [build, check, test]
-
-  publish-gitea:
-    desc: Publish package to Gitea registry
-    deps: [build]
-    cmds:
-      - twine upload --repository-url https://git.quad4.io/api/packages/RNS-Things/pypi dist/*
+    desc: Run clean, lint, test, and build
+    deps: [clean, check, test, build]
 
   publish-pypi:
     desc: Publish package to PyPI
@@ -180,6 +102,22 @@ tasks:
       - twine upload dist/*
 
   publish:
-    desc: Publish package to both Gitea and PyPI
-    deps: [publish-gitea, publish-pypi]
+    desc: Publish package to PyPI
+    deps: [publish-pypi]
 
+  release-dist:
+    desc: Build release artifacts in dist/
+    deps: [build]
+
+  release-upload:
+    desc: Upload dist/ to rngit remote (origin)
+    deps: [release-dist]
+    cmds:
+      - '{{.RNGIT}} release --config {{.RNGIT_CONFIG}} --rnsconfig {{.RNS_CONFIG}} {{.RNGIT_REMOTE}} create {{.RELEASE_TAG}}:{{.RELEASE_DIST}}'
+
+  release:
+    desc: Build, tag, push, and upload release via rngit
+    deps: [release-upload]
+    cmds:
+      - git tag -a {{.RELEASE_TAG}} -m "Release {{.RELEASE_TAG}}" 2>/dev/null || true
+      - git push origin --follow-tags

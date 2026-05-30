@@ -1,22 +1,45 @@
-# Makefile for rns-page-node
+# rns-page-node Makefile
 
-# Extract version from pyproject.toml
-VERSION := $(shell grep "^version =" pyproject.toml | cut -d '"' -f 2)
-VCS_REF := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+VERSION := $(shell grep '^version =' pyproject.toml | cut -d '"' -f 2)
 
-# Detect if docker buildx is available
-DOCKER_BUILD := $(shell docker buildx version >/dev/null 2>&1 && echo "docker buildx build" || echo "docker build")
-DOCKER_BUILD_LOAD := $(shell docker buildx version >/dev/null 2>&1 && echo "docker buildx build --load" || echo "docker build")
+RNGIT ?= rngit
+RNGIT_CONFIG ?= $(HOME)/.rngit
+RNS_CONFIG ?= $(HOME)/.reticulum
+RNGIT_REMOTE ?= $(shell git config --get remote.origin.url)
+RNGIT_IDENTITY ?=
+RNGIT_SIGNER ?=
+RNGIT_NAME ?=
+RELEASE_TAG ?= v$(shell poetry version -s 2>/dev/null || echo $(VERSION))
+RELEASE_DIST ?= dist
+RELEASE_ARTIFACT ?= all
 
-# Build arguments for Docker
-DOCKER_BUILD_ARGS := --build-arg VERSION=$(VERSION) \
-                     --build-arg VCS_REF=$(VCS_REF) \
-                     --build-arg BUILD_DATE=$(BUILD_DATE)
+RNGIT_RELEASE = $(RNGIT) release --config $(RNGIT_CONFIG) --rnsconfig $(RNS_CONFIG)
+RNGIT_RELEASE_OPTS = $(if $(RNGIT_IDENTITY),-i $(RNGIT_IDENTITY),) \
+	$(if $(RNGIT_SIGNER),-s $(RNGIT_SIGNER),) \
+	$(if $(RNGIT_NAME),-n $(RNGIT_NAME),)
+RELEASE_TARGET = $(RELEASE_TAG):$(RELEASE_DIST)
 
-.PHONY: all build sdist wheel clean install lint format docker-wheels docker-build docker-run help test docker-test test-advanced publish publish-gitea publish-pypi
+.PHONY: default help all build sdist wheel clean install install-dev
+.PHONY: lint format check test test-advanced run
+.PHONY: publish publish-pypi
+.PHONY: release-dist release-tag release-push release-local release-upload release
+.PHONY: release-list release-view release-fetch release-verify release-delete
 
-all: build
+default: help
+
+help:
+	@echo "rns-page-node $(VERSION)"
+	@echo ""
+	@echo "Build:     build sdist wheel clean install install-dev"
+	@echo "Quality:   lint format check test test-advanced"
+	@echo "Run:       run"
+	@echo "Publish:   publish publish-pypi"
+	@echo "Release:   release release-dist release-tag release-push release-local release-upload"
+	@echo "           release-list release-view release-fetch release-verify release-delete"
+	@echo "           (set RELEASE_TAG=vX.Y.Z, RNGIT_REMOTE, RNGIT_IDENTITY, etc.)"
+	@echo "Other:     all"
+
+all: clean lint test build
 
 build: clean
 	poetry run python3 -m build
@@ -28,38 +51,23 @@ wheel:
 	poetry run python3 -m build --wheel
 
 clean:
-	rm -rf build dist *.egg-info
+	rm -rf build dist *.egg-info .pytest_cache
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name '*.pyc' -delete 2>/dev/null || true
 
 install: build
 	pip install dist/*.whl
 
+install-dev:
+	poetry install
+
 lint:
-	ruff check .
+	poetry run ruff check .
 
 format:
-	ruff check --fix .
+	poetry run ruff check --fix .
 
-docker-wheels:
-	$(DOCKER_BUILD) --target builder -f docker/Dockerfile -t rns-page-node-builder .
-	docker create --name builder-container rns-page-node-builder true
-	docker cp builder-container:/app/dist ./dist
-	docker rm builder-container
-
-docker-build:
-	$(DOCKER_BUILD_LOAD) $(DOCKER_BUILD_ARGS) $(BUILD_ARGS) -f docker/Dockerfile -t git.quad4.io/rns-things/page-node:latest -t git.quad4.io/rns-things/page-node:$(VERSION) .
-
-docker-run: setup-dirs
-	docker run --rm -it \
-		-v ./pages:/app/pages \
-		-v ./files:/app/files \
-		-v ./node-config:/app/node-config \
-		-v ./reticulum-config:/home/app/.reticulum \
-		git.quad4.io/rns-things/page-node:latest \
-		--node-name "Page Node" \
-		--pages-dir /app/pages \
-		--files-dir /app/files \
-		--identity-dir /app/node-config \
-		--announce-interval 360
+check: lint
 
 test:
 	bash tests/run_tests.sh
@@ -67,36 +75,53 @@ test:
 test-advanced:
 	poetry run pytest tests/test_advanced.py
 
-docker-test:
-	$(DOCKER_BUILD_LOAD) -f docker/Dockerfile.tests -t rns-page-node-tests .
-	docker run --rm rns-page-node-tests
-
-setup-dirs:
-	mkdir -p pages files node-config reticulum-config
-
-help:
-	@echo "Makefile commands:"
-	@echo "  all            - alias for build"
-	@echo "  build          - clean and build sdist and wheel"
-	@echo "  sdist          - build source distribution"
-	@echo "  wheel          - build wheel"
-	@echo "  clean          - remove build artifacts"
-	@echo "  install        - install built wheel"
-	@echo "  lint           - run ruff linter"
-	@echo "  format         - run ruff --fix"
-	@echo "  docker-wheels  - build Python wheels in Docker"
-	@echo "  docker-build   - build runtime Docker image (version: $(VERSION))"
-	@echo "  docker-run     - run runtime Docker image"
-	@echo "  test                 - run local integration tests"
-	@echo "  docker-test          - build and run integration tests in Docker"
-	@echo "  test-advanced        - run advanced tests via pytest"
-	@echo "  publish              - publish to both Gitea and PyPI"
-	@echo "  publish-gitea        - publish to Gitea registry"
-	@echo "  publish-pypi         - publish to PyPI"
-publish-gitea: build
-	twine upload --repository-url https://git.quad4.io/api/packages/RNS-Things/pypi dist/*
+run:
+	poetry run python3 -m rns_page_node.main
 
 publish-pypi: build
 	twine upload dist/*
 
-publish: publish-gitea publish-pypi
+publish: publish-pypi
+
+release-dist: build
+
+release-tag:
+	@tag="$(RELEASE_TAG)"; \
+	if git show-ref --verify --quiet "refs/tags/$$tag"; then \
+		echo "Tag $$tag already exists"; \
+	else \
+		git tag -a "$$tag" -m "Release $$tag"; \
+		echo "Created tag $$tag"; \
+	fi
+
+release-push: release-tag
+	git push origin --follow-tags
+
+release-local: release-dist
+	$(RNGIT_RELEASE) $(RNGIT_RELEASE_OPTS) -L $(RNGIT_REMOTE) create $(RELEASE_TARGET)
+
+release-upload: release-dist
+	@test -n "$(RNGIT_REMOTE)" || (echo "RNGIT_REMOTE is empty; set it or configure git remote origin" && exit 1)
+	$(RNGIT_RELEASE) $(RNGIT_RELEASE_OPTS) $(RNGIT_REMOTE) create $(RELEASE_TARGET)
+
+release: release-dist release-tag release-push release-upload
+
+release-list:
+	@test -n "$(RNGIT_REMOTE)" || (echo "RNGIT_REMOTE is empty" && exit 1)
+	$(RNGIT_RELEASE) $(RNGIT_REMOTE) list
+
+release-view:
+	@test -n "$(RELEASE_TAG)" || (echo "Set RELEASE_TAG=..." && exit 1)
+	$(RNGIT_RELEASE) $(RNGIT_REMOTE) view $(RELEASE_TAG)
+
+release-fetch:
+	@test -n "$(RELEASE_TAG)" || (echo "Set RELEASE_TAG=... and optionally RELEASE_ARTIFACT=all" && exit 1)
+	$(RNGIT_RELEASE) $(RNGIT_RELEASE_OPTS) $(RNGIT_REMOTE) fetch $(RELEASE_TAG):$(RELEASE_ARTIFACT)
+
+release-verify:
+	@test -n "$(RELEASE_TAG)" || (echo "Set RELEASE_TAG=... and optionally RELEASE_ARTIFACT=all" && exit 1)
+	$(RNGIT_RELEASE) $(RNGIT_RELEASE_OPTS) -o $(RNGIT_REMOTE) verify $(RELEASE_TAG):$(RELEASE_ARTIFACT)
+
+release-delete:
+	@test -n "$(RELEASE_TAG)" || (echo "Set RELEASE_TAG=..." && exit 1)
+	$(RNGIT_RELEASE) $(RNGIT_REMOTE) delete $(RELEASE_TAG)

@@ -4,6 +4,9 @@
 
 一种通过 [Reticulum 网络](https://reticulum.network/) 提供页面和文件的简单方法。主要用于提供页面和文件的 [NomadNet](https://github.com/markqvist/NomadNet) 节点的即插即用替代方案。
 
+本项目不再更新，但配置为使用 RNS >= `1.3.4`，因此将始终使用最新的兼容网络栈。
+
+**源码：** [GitHub](https://github.com/Quad4-Software/rns-page-node)（代码镜像）。**发布：** [PyPI](https://pypi.org/project/rns-page-node/) 及通过 Reticulum/rngit 的签名制品。
 ## 特性
 
 - 通过 RNS 提供页面和文件
@@ -20,62 +23,11 @@ pip install rns-page-node
 pipx install rns-page-node
 ```
 
-### 从 Gitea Packages
+### 从 GitHub（源码）
 
 ```bash
-# Pip
-pip install --index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple rns-page-node
-
-# Pipx
-pipx install --pip-args "--index-url https://git.quad4.io/api/packages/RNS-Things/pypi/simple/ --extra-index-url https://pypi.org/simple" rns-page-node
-```
-
-**持久化配置 (可选):**
-
-为了避免每次都输入索引 URL，请将它们添加到您的 `pip.conf` 中：
-
-```ini
-# ~/.config/pip/pip.conf
-[global]
-index-url = https://git.quad4.io/api/packages/RNS-Things/pypi/simple/
-extra-index-url = https://pypi.org/simple
-```
-
-然后您就可以简单地使用：
-
-```bash
-pip install rns-page-node
-# 或者
-pipx install rns-page-node
-```
-
-**手动下载 (最新版本):**
-
-可从 [最新版本](https://git.quad4.io/RNS-Things/page-node/releases/latest) 下载 `rns_page_node-1.5.1-py3-none-any.whl`（wheel）或 `rns_page_node-1.5.1.tar.gz`（源码包）并安装。
-
-```bash
-# Wheel (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# Wheel (curl)
-curl -O -L https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1-py3-none-any.whl
-pip install rns_page_node-1.5.1-py3-none-any.whl
-
-# 源码包 (wget)
-wget https://git.quad4.io/RNS-Things/page-node/releases/download/v1.5.1/rns_page_node-1.5.1.tar.gz
-pip install rns_page_node-1.5.1.tar.gz
-```
-
-```bash
-# Pip
-pip install git+https://git.quad4.io/RNS-Things/page-node.git --break-system-packages
-# Pipx（Git）
-pipx install git+https://git.quad4.io/RNS-Things/page-node.git
-# UV
-uv venv
-source .venv/bin/activate
-uv pip install git+https://git.quad4.io/RNS-Things/page-node.git
+pip install git+https://github.com/Quad4-Software/rns-page-node.git
+pipx install git+https://github.com/Quad4-Software/rns-page-node.git
 ```
 
 ## 使用
@@ -114,22 +66,6 @@ announce-interval=360
 
 优先级：命令行参数 > 配置文件 > 默认值
 
-### Docker/Podman
-
-```bash
-docker run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-### Docker/Podman 无根模式 (Rootless)
-
-```bash
-mkdir -p ./pages ./files ./node-config ./reticulum-config
-chown -R 1000:1000 ./pages ./files ./node-config ./reticulum-config
-podman run -it --rm -v ./pages:/app/pages -v ./files:/app/files -v ./node-config:/app/node-config -v ./reticulum-config:/home/app/.reticulum git.quad4.io/rns-things/page-node:latest
-```
-
-挂载卷是可选的，您也可以使用 `podman cp` 或 `docker cp` 将页面和文件复制到容器中。
-
 ## 编译
 
 ```bash
@@ -140,12 +76,6 @@ make build
 
 ```bash
 make wheel
-```
-
-### 在 Docker 中编译 Wheels
-
-```bash
-make docker-wheels
 ```
 
 ## 开发
