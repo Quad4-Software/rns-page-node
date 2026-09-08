@@ -10,11 +10,14 @@ All notable changes to this project will be documented in this file.
 - Traversal, non-WebP, and malformed media requests are rejected.
 - Unit, security fuzz, adversarial, oracle, stress, and live RNS transport tests cover the /media handler and separate media root.
 - Stress tests exercise deep nesting, symlink escapes, long path boundaries, and concurrent access.
+- GitHub Actions CI workflow with Python version matrix, uv caching, lint, unit, and live transport jobs.
+- CodeQL analysis workflow and dependency review workflow.
 
 ### Changed
-- Minimum RNS dependency raised to 1.5.0. Cryptography lower bound set to 3.4.7 with no upper cap.
+- Minimum RNS dependency raised to 1.5.0. Cryptography lower bound raised to 50.0.0.
 - Added live RNS link integration tests, a shared live test harness, and a test-live make target.
 - Path containment now resolves symlinks with os.path.realpath and verifies containment with os.path.commonpath, replacing Path.resolve and Path.relative_to for a simpler, faster, and more robust check.
+- SECURITY.md updated with supported versions, reporting, response, and disclosure sections.
 
 ### Fixed
 - Removed a redundant resolved path length limit that blocked deep nested media paths.

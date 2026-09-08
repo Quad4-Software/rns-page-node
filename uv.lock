@@ -331,7 +331,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cryptography", specifier = ">=3.4.7" },
+    { name = "cryptography", specifier = ">=50.0.0" },
     { name = "rns", specifier = ">=1.5.0" },
 ]
 

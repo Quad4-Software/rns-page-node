@@ -1,11 +1,20 @@
 # Security Policy
 
-## Reporting
+## Supported Versions
 
-Report vulnerabilities privately via GitHub Security Advisories on this repository.
-Do not open a public issue for security reports.
+The following versions are supported with security updates:
 
-## Response
+| Version | Supported          |
+| ------- | ------------------ |
+| 1.7.x   | Yes                |
+| < 1.7.0 | No                 |
 
-Reports are reviewed as soon as practical. Valid issues get a private advisory and a fix
-release when needed.
+## Reporting a Vulnerability
+
+Report vulnerabilities privately through GitHub Security Advisories on this repository. Do not open a public issue for security reports.
+
+Include a clear description, steps to reproduce, and the expected disclosure timeline.
+
+## Response and Disclosure
+
+Reports are reviewed as soon as practical. Valid issues get a private advisory and a fix release when needed. Disclosure happens through the CHANGELOG and a new release once a fix is available.

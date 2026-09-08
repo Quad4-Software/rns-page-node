@@ -1,0 +1,21 @@
+annotations:
+  - checks:
+      - branch-protection
+    reasons:
+      # This project is maintained through the RNS/rngit mirror, so GitHub branch protection is not part of the release workflow.
+      - reason: not-applicable
+  - checks:
+      - code-review
+    reasons:
+      # The project is maintained by a single author with signed RNS/rngit commits.
+      - reason: not-applicable
+  - checks:
+      - fuzzing
+    reasons:
+      # Adversarial and stress tests are implemented with Hypothesis instead of an OSS-Fuzz integration.
+      - reason: not-supported
+  - checks:
+      - cii-best-practices
+    reasons:
+      # This project has not applied for an OpenSSF CII best practices badge.
+      - reason: not-applicable
