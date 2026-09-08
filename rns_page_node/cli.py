@@ -17,7 +17,10 @@ def setup_parser() -> argparse.ArgumentParser:
         Configured ArgumentParser instance
 
     """
-    parser = argparse.ArgumentParser(description="Minimal Reticulum Page Node")
+    parser = argparse.ArgumentParser(
+        prog="rns-page-node",
+        description="Minimal Reticulum Page Node",
+    )
     parser.add_argument(
         "node_config",
         nargs="?",

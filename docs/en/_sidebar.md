@@ -1,0 +1,6 @@
+- [Home](/)
+- [Installation](installation)
+- [Usage](usage)
+- [Configuration](configuration)
+- [Offline zipapp](offline)
+- [Pure Python variant](pure)

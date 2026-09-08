@@ -19,9 +19,10 @@ RNGIT_RELEASE_OPTS = $(if $(RNGIT_IDENTITY),-i $(RNGIT_IDENTITY),) \
 	$(if $(RNGIT_NAME),-n $(RNGIT_NAME),)
 RELEASE_TARGET = $(RELEASE_TAG):$(RELEASE_DIST)
 
-.PHONY: default help all build sdist wheel clean install install-dev
-.PHONY: lint format check test test-advanced run
-.PHONY: publish publish-pypi
+.PHONY: default help all build build-pure sdist wheel clean install install-dev
+.PHONY: lint format check test test-advanced test-live run
+.PHONY: publish publish-pypi publish-pypi-pure
+.PHONY: pyz pyz-pure completions manpage docs-serve
 .PHONY: release-dist release-tag release-push release-local release-upload release
 .PHONY: release-list release-view release-fetch release-verify release-delete
 
@@ -30,19 +31,25 @@ default: help
 help:
 	@echo "rns-page-node $(VERSION)"
 	@echo ""
-	@echo "Build:     build sdist wheel clean install install-dev"
+	@echo "Build:     build build-pure sdist wheel pyz pyz-pure"
+	@echo "Docs:      completions manpage docs-serve"
 	@echo "Quality:   lint format check test test-advanced test-live"
 	@echo "Run:       run"
-	@echo "Publish:   publish publish-pypi"
+	@echo "Publish:   publish publish-pypi publish-pypi-pure"
 	@echo "Release:   release release-dist release-tag release-push release-local release-upload"
 	@echo "           release-list release-view release-fetch release-verify release-delete"
 	@echo "           (set RELEASE_TAG=vX.Y.Z, RNGIT_REMOTE, RNGIT_IDENTITY, etc.)"
-	@echo "Other:     all"
+	@echo "Other:     all clean install install-dev"
 
 all: clean lint test build
 
-build: clean
+build:
 	poetry run python3 -m build
+
+build-pure:
+	rm -rf pure/rns_page_node pure/dist
+	cp -r rns_page_node pure/rns_page_node
+	poetry run python3 -m build pure --wheel
 
 sdist:
 	poetry run python3 -m build --sdist
@@ -50,8 +57,25 @@ sdist:
 wheel:
 	poetry run python3 -m build --wheel
 
+pyz: build
+	mkdir -p dist
+	poetry run shiv -c rns-page-node -o dist/rns-page-node.pyz .
+
+pyz-pure: build-pure
+	mkdir -p dist
+	poetry run shiv -c rns-page-node -o dist/rns-page-node-pure.pyz pure/dist/rns_page_node_pure-1.7.0-py3-none-any.whl
+
+completions:
+	poetry run python3 tools/generate_completions.py
+
+manpage:
+	poetry run argparse-manpage --pyfile rns_page_node/cli.py --function setup_parser --manual-title "rns-page-node" --output docs/man/rns-page-node.1
+
+docs-serve:
+	python3 -m http.server 3000 --directory docs
+
 clean:
-	rm -rf build dist *.egg-info .pytest_cache
+	rm -rf build dist pure/dist pure/rns_page_node *.egg-info pure/*.egg-info .pytest_cache
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name '*.pyc' -delete 2>/dev/null || true
 
@@ -83,6 +107,9 @@ run:
 
 publish-pypi: build
 	uv tool run twine upload dist/*
+
+publish-pypi-pure: build-pure
+	uv tool run twine upload pure/dist/*
 
 publish: publish-pypi
 

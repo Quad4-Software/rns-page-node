@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling>=1.26.3"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rns-page-node-pure"
+version = "1.7.0"
+license = "GPL-3.0-only"
+description = "Pure Python variant of rns-page-node using rnspure."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "rnspure>=1.5.2",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/Quad4-Software/rns-page-node"
+Repository = "https://github.com/Quad4-Software/rns-page-node"
+
+[project.scripts]
+rns-page-node = "rns_page_node.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["rns_page_node"]

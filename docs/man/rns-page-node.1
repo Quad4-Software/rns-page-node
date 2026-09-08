@@ -1,0 +1,53 @@
+.TH RNS\-PAGE\-NODE "1" "2026\-09\-08" "rns\-page\-node" "rns\-page\-node"
+.SH NAME
+rns\-page\-node
+.SH SYNOPSIS
+.B rns\-page\-node
+[-h] [-c CONFIGPATH] [-p PAGES_DIR] [-f FILES_DIR] [-m MEDIA_DIR] [-n NODE_NAME] [-a ANNOUNCE_INTERVAL] [-i IDENTITY_DIR] [--page-refresh-interval PAGE_REFRESH_INTERVAL] [--file-refresh-interval FILE_REFRESH_INTERVAL] [-l {DEBUG,INFO,WARNING,ERROR,CRITICAL}] [node_config]
+.SH DESCRIPTION
+Minimal Reticulum Page Node
+
+.TP
+\fBnode_config\fR
+Path to rns\-page\-node config file
+
+.SH OPTIONS
+.TP
+\fB\-c\fR \fI\,CONFIGPATH\/\fR, \fB\-\-config\fR \fI\,CONFIGPATH\/\fR
+Reticulum config path
+
+.TP
+\fB\-p\fR \fI\,PAGES_DIR\/\fR, \fB\-\-pages\-dir\fR \fI\,PAGES_DIR\/\fR
+Pages directory
+
+.TP
+\fB\-f\fR \fI\,FILES_DIR\/\fR, \fB\-\-files\-dir\fR \fI\,FILES_DIR\/\fR
+Files directory
+
+.TP
+\fB\-m\fR \fI\,MEDIA_DIR\/\fR, \fB\-\-media\-dir\fR \fI\,MEDIA_DIR\/\fR
+Media directory for images, defaults to pages directory
+
+.TP
+\fB\-n\fR \fI\,NODE_NAME\/\fR, \fB\-\-node\-name\fR \fI\,NODE_NAME\/\fR
+Node display name
+
+.TP
+\fB\-a\fR \fI\,ANNOUNCE_INTERVAL\/\fR, \fB\-\-announce\-interval\fR \fI\,ANNOUNCE_INTERVAL\/\fR
+Announce interval in minutes
+
+.TP
+\fB\-i\fR \fI\,IDENTITY_DIR\/\fR, \fB\-\-identity\-dir\fR \fI\,IDENTITY_DIR\/\fR
+Directory to store node identity
+
+.TP
+\fB\-\-page\-refresh\-interval\fR \fI\,PAGE_REFRESH_INTERVAL\/\fR
+Page refresh interval in seconds, 0 disables auto\-refresh
+
+.TP
+\fB\-\-file\-refresh\-interval\fR \fI\,FILE_REFRESH_INTERVAL\/\fR
+File refresh interval in seconds, 0 disables auto\-refresh
+
+.TP
+\fB\-l\fR \fI\,{DEBUG,INFO,WARNING,ERROR,CRITICAL}\/\fR, \fB\-\-log\-level\fR \fI\,{DEBUG,INFO,WARNING,ERROR,CRITICAL}\/\fR
+Logging level

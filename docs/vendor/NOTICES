@@ -1,0 +1,6 @@
+Vendored assets
+
+- docsify.min.js, core.min.css, search.min.js
+  Source: https://github.com/docsifyjs/docsify
+  Version: 5.0.0
+  License: MIT

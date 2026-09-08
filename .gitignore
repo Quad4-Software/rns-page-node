@@ -5,6 +5,9 @@ __pycache__/
 .ruff_cache/
 .pytest_cache/
 dist/
+pure/rns_page_node/
+pure/dist/
+pure/*.egg-info/
 build/
 *.egg-info/
 .venv/

@@ -12,6 +12,11 @@ All notable changes to this project will be documented in this file.
 - Stress tests exercise deep nesting, symlink escapes, long path boundaries, and concurrent access.
 - GitHub Actions CI workflow with Python version matrix, uv caching, lint, unit, and live transport jobs.
 - CodeQL analysis workflow and dependency review workflow.
+- Docsify documentation under docs/ with an English section and a GitHub Pages deployment workflow.
+- Shell completion scripts for bash, zsh, fish, tcsh and PowerShell in completions/.
+- Manpage at docs/man/rns-page-node.1.
+- rns-page-node-pure package in pure/ for systems without PyCA/cryptography.
+- Makefile targets to build standalone .pyz zipapps for both main and pure variants.
 
 ### Changed
 - Minimum Python version raised to 3.10 to keep dependency updates compatible with fixed pytest and cryptography releases.

@@ -9,7 +9,7 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "rns>=1.5.0",
+    "rns>=1.5.2",
     "cryptography>=50.0.0",
 ]
 classifiers = [
@@ -33,6 +33,9 @@ build = "^1.4.4"
 hypothesis = "^6.141.1"
 pytest = "^9.1.1"
 ruff = "^0.15.15"
+shtab = "^1.9.2"
+argparse-manpage = "^4.6"
+shiv = "^1.0.8"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

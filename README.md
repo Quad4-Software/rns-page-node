@@ -1,10 +1,10 @@
 # RNS Page Node
 
-[Русский](docs/languages/README.ru.md) | [中文](docs/languages/README.zh.md) | [日本語](docs/languages/README.ja.md) | [Italiano](docs/languages/README.it.md) | [Deutsch](docs/languages/README.de.md)
+A simple way to serve pages and files over the [Reticulum network](https://reticulum.network/). It is a drop-in replacement for [NomadNet](https://github.com/markqvist/NomadNet) nodes that primarily serve pages and files. For more advanced setups, use NomadNet.
 
-A simple way to serve simple pages and files over the [Reticulum network](https://reticulum.network/). Drop-in replacement for [NomadNet](https://github.com/markqvist/NomadNet) nodes that primarily serve pages and files. For more advanced pages and setups you should use NomadNet.
+Full documentation lives in [docs/](docs). The rendered site is at https://quad4-software.github.io/rns-page-node.
 
-This project is no longer being updated, but it is configured to use RNS >= `1.5.0` so it will always use the latest compatible network stack.
+The project targets RNS 1.5.0 and newer and Python 3.10 and newer.
 
 **Source:** [GitHub](https://github.com/Quad4-Software/rns-page-node) (code mirror). **Releases:** [PyPI](https://pypi.org/project/rns-page-node/) and signed artifacts on Reticulum via [rngit](https://github.com/markqvist/Reticulum) (`origin` RNS remote).
 
@@ -119,6 +119,40 @@ make lint
 ```
 
 `make test` runs the same script as `tests/run_tests.sh`.
+
+## Pure Python variant
+
+For targets that cannot install PyCA/cryptography, install the pure package:
+
+```bash
+pip install rns-page-node-pure
+```
+
+It depends on `rnspure` and uses Reticulum's internal pure Python crypto backend.
+
+## Shell completions, manpage and docs
+
+- Completions for bash, zsh, fish, tcsh and PowerShell are in `completions/`.
+- The manpage is at `docs/man/rns-page-node.1`.
+- Docsify documentation is in `docs/` and deploys to GitHub Pages.
+
+Build the files with:
+
+```bash
+make completions
+make manpage
+```
+
+## Offline zipapps
+
+Build a single `.pyz` file with all dependencies included:
+
+```bash
+make pyz
+make pyz-pure
+```
+
+Run it with `python3 dist/rns-page-node.pyz`.
 
 ## Releases
 
