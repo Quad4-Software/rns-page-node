@@ -408,6 +408,79 @@ body.close .content {
   opacity: 0 !important;
 }
 
+/* Navbar dropdown */
+.app-nav li ul {
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 4px !important;
+  padding: 0.5rem 0 !important;
+  min-width: 8rem;
+}
+
+.app-nav li ul li {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app-nav li ul li a {
+  color: var(--muted) !important;
+  padding: 0.4rem 1rem !important;
+  border-bottom: none !important;
+  font-size: 0.92rem !important;
+}
+
+.app-nav li ul li a:hover,
+.app-nav li ul li a.active {
+  color: var(--title) !important;
+  background: var(--code-bg) !important;
+  text-decoration: none !important;
+}
+
+/* Sidebar and collapse width */
+.sidebar {
+  box-sizing: border-box !important;
+}
+
+.sidebar-toggle {
+  box-sizing: border-box !important;
+  border-right: none !important;
+}
+
+body.close .sidebar-toggle {
+  border-right: none !important;
+}
+
+.sidebar ul {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.sidebar li {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.sidebar li > p,
+.sidebar ul li a,
+.sidebar ul li ul li a {
+  display: block !important;
+  padding: 0.45rem 1.25rem !important;
+}
+
+.sidebar ul li a:hover {
+  background: var(--code-bg) !important;
+}
+
+.sidebar ul li ul {
+  padding-left: 0 !important;
+  background: transparent !important;
+}
+
+.sidebar ul li ul li a {
+  padding-left: 2.25rem !important;
+}
+
 /* Scrollbars */
 * {
   scrollbar-width: thin;
