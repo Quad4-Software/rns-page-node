@@ -82,7 +82,7 @@ run:
 	poetry run python3 -m rns_page_node.main
 
 publish-pypi: build
-	twine upload dist/*
+	uv tool run twine upload dist/*
 
 publish: publish-pypi
 

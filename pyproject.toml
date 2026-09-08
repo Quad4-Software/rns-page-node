@@ -7,7 +7,7 @@ authors = [
     {name = "Ivan"}
 ]
 readme = "README.md"
-requires-python = ">=3.9.2"
+requires-python = ">=3.10"
 dependencies = [
     "rns>=1.5.0",
     "cryptography>=50.0.0",
@@ -31,9 +31,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.group.dev.dependencies]
 build = "^1.4.4"
 hypothesis = "^6.141.1"
-pytest = "^8.4.2"
+pytest = "^9.1.1"
 ruff = "^0.15.15"
-twine = "^6.2.0"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

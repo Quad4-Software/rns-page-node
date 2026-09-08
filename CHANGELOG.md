@@ -14,7 +14,9 @@ All notable changes to this project will be documented in this file.
 - CodeQL analysis workflow and dependency review workflow.
 
 ### Changed
+- Minimum Python version raised to 3.10 to keep dependency updates compatible with fixed pytest and cryptography releases.
 - Minimum RNS dependency raised to 1.5.0. Cryptography lower bound raised to 50.0.0.
+- Twine removed from dev dependencies; releases use uv tool run twine.
 - Added live RNS link integration tests, a shared live test harness, and a test-live make target.
 - Path containment now resolves symlinks with os.path.realpath and verifies containment with os.path.commonpath, replacing Path.resolve and Path.relative_to for a simpler, faster, and more robust check.
 - SECURITY.md updated with supported versions, reporting, response, and disclosure sections.

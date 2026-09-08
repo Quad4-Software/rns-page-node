@@ -11,7 +11,7 @@ The following versions are supported with security updates:
 
 ## Reporting a Vulnerability
 
-Report vulnerabilities privately through GitHub Security Advisories on this repository. Do not open a public issue for security reports.
+Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/Quad4-Software/rns-page-node/security/advisories/new) on this repository. Do not open a public issue for security reports.
 
 Include a clear description, steps to reproduce, and the expected disclosure timeline.
 
