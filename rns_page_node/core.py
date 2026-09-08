@@ -7,7 +7,7 @@ from typing import Any, List, Optional, Union
 
 import RNS
 
-from .handlers import serve_default_index, serve_file, serve_page
+from .handlers import serve_default_index, serve_file, serve_media, serve_page
 
 
 class PageNode:
@@ -50,6 +50,7 @@ class PageNode:
 
         self.register_pages()
         self.register_files()
+        self.register_media()
 
         self.destination.set_link_established_callback(self.on_connect)
 
@@ -97,6 +98,25 @@ class PageNode:
             remote_identity,
             requested_at,
             self._files_root,
+        )
+
+    def serve_media(
+        self,
+        path: str,
+        data: Any,
+        request_id: bytes,
+        link_id: Any,
+        remote_identity: Any,
+        requested_at: float,
+    ) -> Any:
+        return serve_media(
+            path,
+            data,
+            request_id,
+            link_id,
+            remote_identity,
+            requested_at,
+            self._pages_root,
         )
 
     def register_pages(self) -> None:
@@ -150,6 +170,14 @@ class PageNode:
                 allow=RNS.Destination.ALLOW_ALL,
                 auto_compress=32_000_000,
             )
+
+    def register_media(self) -> None:
+        self._pages_root = self.pagespath.resolve()
+        self.destination.register_request_handler(
+            "/media",
+            response_generator=self.serve_media,
+            allow=RNS.Destination.ALLOW_ALL,
+        )
 
     def _scan_pages(self, base: Union[Path, str]) -> List[str]:
         if isinstance(base, str):

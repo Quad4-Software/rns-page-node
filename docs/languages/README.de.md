@@ -4,7 +4,7 @@
 
 Ein einfacher Weg, um Seiten und Dateien über das [Reticulum-Netzwerk](https://reticulum.network/) bereitzustellen. Drop-in-Ersatz für [NomadNet](https://github.com/markqvist/NomadNet)-Knoten, die hauptsächlich Seiten und Dateien bereitstellen.
 
-Dieses Projekt wird nicht mehr weiterentwickelt, ist aber für RNS >= `1.3.4` konfiguriert und nutzt damit stets den neuesten kompatiblen Netzwerk-Stack.
+Dieses Projekt wird nicht mehr weiterentwickelt, ist aber für RNS >= `1.5.0` konfiguriert und nutzt damit stets den neuesten kompatiblen Netzwerk-Stack.
 
 **Quelle:** [GitHub](https://github.com/Quad4-Software/rns-page-node) (Code-Spiegel). **Releases:** [PyPI](https://pypi.org/project/rns-page-node/) und signierte Artefakte über Reticulum/rngit.
 

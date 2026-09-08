@@ -4,7 +4,7 @@
 
 A simple way to serve simple pages and files over the [Reticulum network](https://reticulum.network/). Drop-in replacement for [NomadNet](https://github.com/markqvist/NomadNet) nodes that primarily serve pages and files. For more advanced pages and setups you should use NomadNet.
 
-This project is no longer being updated, but it is configured to use RNS >= `1.3.4` so it will always use the latest compatible network stack.
+This project is no longer being updated, but it is configured to use RNS >= `1.5.0` so it will always use the latest compatible network stack.
 
 **Source:** [GitHub](https://github.com/Quad4-Software/rns-page-node) (code mirror). **Releases:** [PyPI](https://pypi.org/project/rns-page-node/) and signed artifacts on Reticulum via [rngit](https://github.com/markqvist/Reticulum) (`origin` RNS remote).
 
@@ -16,12 +16,26 @@ This project is no longer being updated, but it is configured to use RNS >= `1.3
 
 ## Installation
 
+Requires rns-page-node 1.6.1 or newer for Reticulum (rns) 1.5.0. Older PyPI releases cap rns below 1.5.0 and cryptography below 47, which conflicts with current Reticulum.
+
 ### From PyPI
 
 ```bash
-pip install rns-page-node
+pip install "rns-page-node>=1.6.1"
 # or
-pipx install rns-page-node
+pipx install "rns-page-node>=1.6.1"
+```
+
+With uv:
+
+```bash
+uv tool install "rns-page-node>=1.6.1"
+```
+
+If PyPI does not list 1.6.1 yet, install from GitHub (below) or upgrade an existing pipx app:
+
+```bash
+pipx install "git+https://github.com/Quad4-Software/rns-page-node.git" --force
 ```
 
 ### From GitHub (source)
@@ -30,6 +44,12 @@ pipx install rns-page-node
 pip install git+https://github.com/Quad4-Software/rns-page-node.git
 # or
 pipx install git+https://github.com/Quad4-Software/rns-page-node.git
+```
+
+With uv:
+
+```bash
+uv tool install "git+https://github.com/Quad4-Software/rns-page-node.git"
 ```
 
 ### From an rngit release

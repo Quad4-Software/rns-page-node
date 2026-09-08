@@ -21,6 +21,10 @@ You are not authorised to carry out the request.
 DEFAULT_INDEX_BYTES = DEFAULT_INDEX.encode("utf-8")
 DEFAULT_NOTALLOWED_BYTES = DEFAULT_NOTALLOWED.encode("utf-8")
 
+MEDIA_EXTS = [".webp"]
+_MAX_MEDIA_INPUT_PATH = 512
+_MAX_MEDIA_RESOLVED_PATH = 1024
+
 
 def _relative_under_route(path: str, prefix_with_slash: str) -> str:
     n = len(prefix_with_slash)
@@ -160,3 +164,51 @@ def serve_file(
     except OSError as err:
         RNS.log(f"Error opening file {file_path}: {err}", RNS.LOG_ERROR)
         return DEFAULT_NOTALLOWED_BYTES
+
+
+def serve_media(
+    _path: str,
+    data: Any,
+    _request_id: bytes,
+    _link_id: bytes,
+    _remote_identity: Any,
+    _requested_at: float,
+    pagespath: Path,
+) -> Union[bytes, list[Any], bool]:
+    if not isinstance(data, dict):
+        return False
+    if "path" not in data or "key" not in data:
+        return False
+    media_path = data["path"]
+    if not isinstance(media_path, str):
+        return False
+    if "\x00" in media_path or len(media_path) > _MAX_MEDIA_INPUT_PATH:
+        return False
+
+    relative = media_path.lstrip("/").removeprefix("media/").lstrip("/")
+    file_path = _safe_join_resolved_root(pagespath, relative)
+    if file_path is None:
+        return False
+    if len(str(file_path)) > _MAX_MEDIA_RESOLVED_PATH:
+        RNS.log(
+            f"Invalid media request path length: {len(str(file_path))}",
+            RNS.LOG_DEBUG,
+        )
+        return False
+    if file_path.suffix.lower() not in MEDIA_EXTS:
+        RNS.log(
+            f"Invalid media request type: {file_path}, must be in {MEDIA_EXTS}",
+            RNS.LOG_DEBUG,
+        )
+        return False
+    if not file_path.is_file():
+        return False
+
+    try:
+        return [
+            file_path.open("rb"),
+            {"name": file_path.name.encode("utf-8")},
+        ]
+    except OSError as err:
+        RNS.log(f"Error opening media {file_path}: {err}", RNS.LOG_ERROR)
+        return False

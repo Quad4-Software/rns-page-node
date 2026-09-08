@@ -2,61 +2,74 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.6.0] - 2026-05-30 - **Final Release**
+## [1.7.0] - 2026-09-08
 
-This project will no longer be updated, but is configured to use RNS >= `1.3.4` so it will always use the latest compatible stack.
+### Added
+- Support for serving WebP images to NomadNet 1.4.x clients through a new /media request handler.
+- Images are served from the pages directory and must use the .webp extension.
+- Traversal, non-WebP, and malformed media requests are rejected.
+- Unit, security fuzz, and live RNS transport tests cover the /media handler.
 
 ### Changed
-- **Dependencies**: `rns>=1.3.4` (open lower bound in `pyproject.toml`, `requirements.txt`, and setuptools metadata via `setup.py` shim).
-- **Python**: Minimum version remains `>=3.9.2`; dev tooling capped to versions that support 3.9 (`pytest` 8.x, `build` 1.4.x, `hypothesis` 6.141.x).
-- **Documentation**: `README.md` and translations updated for final maintenance mode; Docker install/build sections removed.
-- **Makefile**: Docker targets removed; [rngit](https://github.com/markqvist/Reticulum) release targets added (`release`, `release-upload`, `release-fetch`, etc., matching LXMFy workflow).
-- **Taskfile**: Docker tasks removed to match dropped container support.
+- Minimum RNS dependency raised to 1.5.0. Cryptography lower bound set to 3.4.7 with no upper cap.
+- Added live RNS link integration tests, a shared live test harness, and a test-live make target.
+
+## [1.6.0] - 2026-05-30
+
+This project will no longer be updated, but is configured to use RNS 1.3.4 or newer so it will always use the latest compatible stack.
+
+### Changed
+- Minimum RNS dependency set to 1.3.4 with an open upper bound.
+- Minimum Python version remains 3.9.2. Dev tooling capped to versions that support 3.9.
+- README and translations updated for final maintenance mode. Docker install and build sections removed.
+- Makefile Docker targets removed. rngit release targets added (release, release-upload, release-fetch, and related targets).
+- Taskfile Docker tasks removed to match dropped container support.
 
 ### Removed
-- Docker support (`docker/`, images, and all `make docker-*` / Taskfile docker tasks) as no longer maintained.
+- Docker support (docker directory, images, and all make docker-* / Taskfile docker tasks).
 
 ## [1.5.1] - 2026-04-30
 
 ### Security
-- **Docker**: Install `pip>=26.1` in the builder venv, the runtime venv, and the base image Python so Trivy no longer flags CVE-2026-3219 (ambiguous tar/zip handling in pip before 26.1).
+- Docker images install pip 26.1 or newer in builder, runtime, and base image Python to address CVE-2026-3219.
 
 ### Dependencies
-- **Updated**: `rns` `>=1.2.0,<1.5.0`; `cryptography` `>=47.0.0,<48`.
+- Updated rns to >=1.2.0,<1.5.0 and cryptography to >=47.0.0,<48.
 
 ## [1.5.0] - 2026-04-20
 
 ### Dependencies
-- **Runtime**: `rns` `>=1.1.6,<1.5.0` (lock: 1.1.6); `cryptography` `>=46.0.7,<47` (lock: 46.0.7).
-- **Development**: `pytest` ^8.4 (lock: 8.4.2), `hypothesis` ^6.135 (lock: 6.141.1), `ruff` ^0.14.10 (lock: 0.14.14), `build` ^1.3 (lock: 1.4.2), `twine` ^6.2.0 (lock: 6.2.0). `pytest` configuration added under `[tool.pytest.ini_options]` in `pyproject.toml`.
+- Runtime: rns >=1.1.6,<1.5.0 and cryptography >=46.0.7,<47.
+- Development: pytest, hypothesis, ruff, build, and twine updates. Pytest configuration added in pyproject.toml.
 
 ### Security
-- Page and file handlers now resolve paths under the configured root using `Path.resolve()` and `Path.relative_to()`, replacing string prefix checks so directory traversal and prefix edge cases are rejected consistently; invalid paths during resolution are handled safely. Relative segments reject embedded NUL bytes and normalize backslashes to forward slashes before resolving (Windows-style `..\\..\\file` cannot bypass checks on POSIX by being treated as a single file name).
-- `tests/test_path_security.py`: parametrized traversal cases, outside-file marker never appears under Hypothesis fuzzing of path components, and invariants on `_safe_file_in_root` results.
+- Page and file handlers resolve paths under the configured root with Path.resolve() and Path.relative_to(), replacing string prefix checks. Directory traversal and prefix edge cases are rejected consistently.
+- Relative path segments reject embedded NUL bytes and normalize backslashes before resolving.
+- Added test_path_security.py with parametrized traversal cases and Hypothesis fuzzing.
 
 ### Changed
-- `tests/run_tests.sh` runs `pytest` (unit, property, and advanced tests) before the local transport client script.
-- `README.md` and localized readmes (`docs/languages/README.*.md`): Git install commands match the English guide; **Development** section added (Poetry, `tests/run_tests.sh`, Ruff). `Makefile` `test-advanced` target uses `pytest` like `Taskfile.yml`.
+- run_tests.sh runs pytest before the local transport client script.
+- README and localized readmes updated. Development section added. Makefile test-advanced uses pytest.
 
 ### Removed
-- Nix-related Taskfile targets (`nix-shell`, `nix-build`). Project environments use Poetry (and Docker where documented); Renovate and Flake-based tooling were dropped from the repo.
-- DeepSource configuration (`.deepsource.toml`) removed.
+- Nix-related Taskfile targets. Renovate and Flake-based tooling dropped.
+- DeepSource configuration removed.
 
 ### Added
-- `tests/test_handlers_unit.py` and `tests/test_config_unit.py`: unit coverage and Hypothesis-based checks for handlers and config loading.
-- `tests/test_path_security.py`: security-focused and fuzz tests for path handling (included in `tests/run_tests.sh`).
+- Unit tests for handlers and config loading.
+- Security-focused path handling tests included in run_tests.sh.
 
 ## [1.4.0] - 2026-01-15
 
 ### Added
-- **PyPI Support**: Added automation and workflows to publish the package to PyPI in addition to Gitea.
-- **Manual Installation**: Added instructions and examples for downloading and installing `.whl` files directly from releases using `wget` or `curl`.
-- **Docker Permissions**: Introduced `docker/entrypoint.sh` using `su-exec` to automatically fix volume permission issues when running in Docker.
-- **Task Automation**: Added `publish`, `publish-gitea`, and `publish-pypi` targets to `Makefile` and `Taskfile.yml`.
-- **Project Structure**: Created `cli.py`, `config.py`, `core.py`, and `handlers.py` to modularize the codebase.
+- PyPI publishing automation and workflows.
+- Manual installation instructions for wheel files from releases.
+- Docker entrypoint using su-exec for volume permission fixes.
+- Publish targets in Makefile and Taskfile.
+- Modular package layout: cli, config, core, and handlers modules.
 
 ### Changed
-- **Refactoring**: Completely refactored the monolithic `main.py` into a modular package structure for better maintainability and testability.
-- **Type Hinting**: Added full PEP 484 type hints across the entire codebase.
-- **Documentation**: Comprehensive update of `README.md` and all translations (German, Italian, Japanese, Russian, Chinese) to reflect new installation methods.
-- **Testing**: Updated the test suite (`run_tests.sh` and `test_advanced.py`) to support the new modular structure and improved reliability.
+- Refactored monolithic main.py into a modular package structure.
+- Full PEP 484 type hints across the codebase.
+- README and all translations updated for new installation methods.
+- Test suite updated for the modular structure.

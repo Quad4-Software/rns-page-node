@@ -4,7 +4,7 @@
 
 Un modo semplice per servire pagine e file sulla [rete Reticulum](https://reticulum.network/). Sostituto drop-in per i nodi [NomadNet](https://github.com/markqvist/NomadNet) che servono principalmente pagine e file.
 
-Questo progetto non viene più aggiornato, ma è configurato per usare RNS >= `1.3.4` e userà sempre l'ultimo stack di rete compatibile.
+Questo progetto non viene più aggiornato, ma è configurato per usare RNS >= `1.5.0` e userà sempre l'ultimo stack di rete compatibile.
 ## Caratteristiche
 
 - Serve pagine e file su RNS

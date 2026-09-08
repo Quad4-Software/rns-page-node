@@ -1,229 +1,156 @@
 #!/usr/bin/env python3
-import os
+"""Legacy transport client script used by tests/run_tests.sh."""
+
+from __future__ import annotations
+
 import sys
 import threading
 import time
+from pathlib import Path
+from typing import Any
 
 import RNS
-
-# Determine base directory for tests
-dir_path = os.path.abspath(os.path.dirname(__file__))
-config_dir = os.path.join(dir_path, "config")
-identity_dir = os.path.join(dir_path, "node-config")
-
-# Initialize Reticulum with shared config
-RNS.Reticulum(config_dir)
-
-# Load server identity (created by the page node)
-identity_file = os.path.join(identity_dir, "identity")
-server_identity = RNS.Identity.from_file(identity_file)
-
-# Create a destination to the server node
-destination = RNS.Destination(
-    server_identity,
-    RNS.Destination.OUT,
-    RNS.Destination.SINGLE,
-    "nomadnetwork",
-    "node",
+from live_support import (
+    _materialize_link_response,
+    read_file_response,
+    response_to_text,
 )
 
-# Ensure we know a path to the destination
-if not RNS.Transport.has_path(destination.hash):
-    RNS.Transport.request_path(destination.hash)
-    while not RNS.Transport.has_path(destination.hash):
-        time.sleep(0.1)
-
-# Establish a link to the server
-global_link = RNS.Link(destination)
-
-# Containers for responses
-responses = {}
-done_event = threading.Event()
-
-# Test data for environment variables
-test_data_dict = {
+TEST_DATA_DICT = {
     "var_field_test": "dictionary_value",
     "var_field_message": "hello_world",
     "var_action": "test_action",
 }
-test_data_dict2 = {
+TEST_DATA_DICT2 = {
     "field_username": "testuser",
     "field_message": "hello_from_form",
     "var_action": "submit",
 }
 
 
-# Callback for page response
-def on_page(response):
-    data = response.response
-    if isinstance(data, bytes):
-        text = data.decode("utf-8")
-    else:
-        text = str(data)
-    print("Received page (no data):")
-    print(text)
-    responses["page"] = text
-    check_responses()
+def run_client_flow(config_dir: Path, identity_file: Path) -> dict[str, str]:
+    """Run the multi-request client flow and return decoded response text."""
+    RNS.Reticulum(str(config_dir))
+    server_identity = RNS.Identity.from_file(str(identity_file))
+    destination = RNS.Destination(
+        server_identity,
+        RNS.Destination.OUT,
+        RNS.Destination.SINGLE,
+        "nomadnetwork",
+        "node",
+    )
 
+    if not RNS.Transport.has_path(destination.hash):
+        RNS.Transport.request_path(destination.hash)
+        while not RNS.Transport.has_path(destination.hash):
+            time.sleep(0.1)
 
-# Callback for page response with dictionary data
-def on_page_dict(response):
-    data = response.response
-    if isinstance(data, bytes):
-        text = data.decode("utf-8")
-    else:
-        text = str(data)
-    print("Received page (dict data):")
-    print(text)
-    responses["page_dict"] = text
-    check_responses()
+    responses: dict[str, str] = {}
+    done_event = threading.Event()
+    link = RNS.Link(destination)
 
+    def check_responses() -> None:
+        if all(key in responses for key in ("page", "page_dict", "page_dict2", "file")):
+            done_event.set()
 
-# Callback for page response with second dict data
-def on_page_dict2(response):
-    data = response.response
-    if isinstance(data, bytes):
-        text = data.decode("utf-8")
-    else:
-        text = str(data)
-    print("Received page (dict2 data):")
-    print(text)
-    responses["page_dict2"] = text
-    check_responses()
+    def on_page(response: Any) -> None:
+        text = response_to_text(_materialize_link_response(response))
+        print("Received page (no data):")
+        print(text)
+        responses["page"] = text
+        check_responses()
 
+    def on_page_dict(response: Any) -> None:
+        text = response_to_text(_materialize_link_response(response))
+        print("Received page (dict data):")
+        print(text)
+        responses["page_dict"] = text
+        check_responses()
 
-def check_responses():
-    if (
-        "page" in responses
-        and "page_dict" in responses
-        and "page_dict2" in responses
-        and "file" in responses
-    ):
-        done_event.set()
+    def on_page_dict2(response: Any) -> None:
+        text = response_to_text(_materialize_link_response(response))
+        print("Received page (dict2 data):")
+        print(text)
+        responses["page_dict2"] = text
+        check_responses()
 
-
-# Callback for file response
-def on_file(response):
-    data = response.response
-    # Handle response as [fileobj, headers]
-    if isinstance(data, list) and len(data) == 2 and hasattr(data[0], "read"):
-        fileobj, headers = data
-        file_data = fileobj.read()
-        filename = headers.get(b"name", b"").decode("utf-8")
-        print(f"Received file ({filename}):")
-        print(file_data.decode("utf-8"))
-        responses["file"] = file_data.decode("utf-8")
-    # Handle response as a raw file object
-    elif hasattr(data, "read"):
-        file_data = data.read()
-        filename = os.path.basename("text.txt")
-        print(f"Received file ({filename}):")
-        print(file_data.decode("utf-8"))
-        responses["file"] = file_data.decode("utf-8")
-    # Handle response as raw bytes
-    elif isinstance(data, bytes):
-        text = data.decode("utf-8")
-        print("Received file:")
+    def on_file(response: Any) -> None:
+        body, name = read_file_response(_materialize_link_response(response))
+        text = body.decode("utf-8")
+        print(f"Received file ({name}):")
         print(text)
         responses["file"] = text
-    else:
-        print("Received file (unhandled format):", data)
-        responses["file"] = str(data)
-    check_responses()
+        check_responses()
+
+    def on_link_established(active_link: RNS.Link) -> None:
+        active_link.request("/page/index.mu", None, response_callback=on_page)
+        active_link.request(
+            "/page/index.mu", TEST_DATA_DICT, response_callback=on_page_dict
+        )
+        active_link.request(
+            "/page/index.mu",
+            TEST_DATA_DICT2,
+            response_callback=on_page_dict2,
+        )
+        active_link.request("/file/text.txt", None, response_callback=on_file)
+
+    link.set_link_established_callback(on_link_established)
+    link.set_link_closed_callback(lambda _link: done_event.set())
+
+    if not done_event.wait(timeout=30):
+        raise TimeoutError("Client flow timed out waiting for responses")
+
+    return responses
 
 
-# Request the pages and file once the link is established
-def on_link_established(link):
-    # Test page without data
-    link.request("/page/index.mu", None, response_callback=on_page)
-    # Test page with dictionary data (simulates var_ prefixed data)
-    link.request("/page/index.mu", test_data_dict, response_callback=on_page_dict)
-    # Test page with form field data (simulates field_ prefixed data)
-    link.request("/page/index.mu", test_data_dict2, response_callback=on_page_dict2)
-    # Test file serving
-    link.request("/file/text.txt", None, response_callback=on_file)
-
-
-# Register callbacks
-global_link.set_link_established_callback(on_link_established)
-global_link.set_link_closed_callback(lambda link: done_event.set())
-
-# Wait for responses or timeout
-if not done_event.wait(timeout=30):
-    print("Test timed out.", file=sys.stderr)
-    sys.exit(1)
-
-
-# Validate test results
-def validate_test_results():
-    """Validate that all responses contain expected content"""
-    # Check basic page response (no data)
+def validate_test_results(responses: dict[str, str]) -> bool:
     if "page" not in responses:
         print("ERROR: No basic page response received", file=sys.stderr)
         return False
-
-    page_content = responses["page"]
-    if "No parameters received" not in page_content:
-        print("ERROR: Basic page should show 'No parameters received'", file=sys.stderr)
+    if "LIVE_INDEX" not in responses["page"]:
+        print("ERROR: Basic page should include LIVE_INDEX marker", file=sys.stderr)
         return False
-    if "33aff86b736acd47dca07e84630fd192" not in page_content:
-        print("ERROR: Basic page should show mock remote identity", file=sys.stderr)
+    if "var_" in responses["page"] or "field_" in responses["page"]:
+        print(
+            "ERROR: Basic page should not include request parameters", file=sys.stderr
+        )
         return False
 
-    # Check page with dictionary data
     if "page_dict" not in responses:
         print("ERROR: No dictionary data page response received", file=sys.stderr)
         return False
-
-    dict_content = responses["page_dict"]
-    if "var_field_test" not in dict_content or "dictionary_value" not in dict_content:
-        print(
-            "ERROR: Dictionary data page should contain processed environment variables",
-            file=sys.stderr,
-        )
-        return False
-    if "33aff86b736acd47dca07e84630fd192" not in dict_content:
-        print(
-            "ERROR: Dictionary data page should show mock remote identity",
-            file=sys.stderr,
-        )
+    if "var_field_test=dictionary_value" not in responses["page_dict"]:
+        print("ERROR: Dictionary data page missing var_field_test", file=sys.stderr)
         return False
 
-    # Check page with second dictionary data (form fields)
     if "page_dict2" not in responses:
         print("ERROR: No dict2 data page response received", file=sys.stderr)
         return False
-
-    dict2_content = responses["page_dict2"]
-    if "field_username" not in dict2_content or "testuser" not in dict2_content:
-        print(
-            "ERROR: Dict2 data page should contain processed environment variables",
-            file=sys.stderr,
-        )
-        return False
-    if "33aff86b736acd47dca07e84630fd192" not in dict2_content:
-        print(
-            "ERROR: Dict2 data page should show mock remote identity",
-            file=sys.stderr,
-        )
+    if "field_username=testuser" not in responses["page_dict2"]:
+        print("ERROR: Dict2 data page missing field_username", file=sys.stderr)
         return False
 
-    # Check file response
     if "file" not in responses:
         print("ERROR: No file response received", file=sys.stderr)
         return False
-
-    file_content = responses["file"]
-    if "This is a test file" not in file_content:
-        print("ERROR: File content doesn't match expected content", file=sys.stderr)
+    if "This is a test file" not in responses["file"]:
+        print("ERROR: File content does not match expected content", file=sys.stderr)
         return False
 
     return True
 
 
-if validate_test_results():
-    print("All tests passed! Environment variable processing works correctly.")
-    sys.exit(0)
-else:
+def main() -> None:
+    dir_path = Path(__file__).resolve().parent
+    config_dir = dir_path / "config"
+    identity_file = dir_path / "node-config" / "identity"
+    responses = run_client_flow(config_dir, identity_file)
+    if validate_test_results(responses):
+        print("All tests passed! Environment variable processing works correctly.")
+        sys.exit(0)
     print("Tests failed.", file=sys.stderr)
     sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

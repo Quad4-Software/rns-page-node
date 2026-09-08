@@ -4,7 +4,7 @@
 
 一种通过 [Reticulum 网络](https://reticulum.network/) 提供页面和文件的简单方法。主要用于提供页面和文件的 [NomadNet](https://github.com/markqvist/NomadNet) 节点的即插即用替代方案。
 
-本项目不再更新，但配置为使用 RNS >= `1.3.4`，因此将始终使用最新的兼容网络栈。
+本项目不再更新，但配置为使用 RNS >= `1.5.0`，因此将始终使用最新的兼容网络栈。
 
 **源码：** [GitHub](https://github.com/Quad4-Software/rns-page-node)（代码镜像）。**发布：** [PyPI](https://pypi.org/project/rns-page-node/) 及通过 Reticulum/rngit 的签名制品。
 ## 特性

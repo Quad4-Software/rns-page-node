@@ -2,52 +2,51 @@
 set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Remove previous test artifacts
 rm -rf config node-config pages files node.log
 
-# Create directories for config, node identity, pages, and files
-mkdir -p config node-config pages files
+export PYTHONPATH="$(realpath ..)"
 
-# Create a sample page and a test file
-cat > pages/index.mu << 'EOF'
-#!/usr/bin/env python3
-import os
+poetry run python3 << 'EOF'
+from pathlib import Path
 
-print("`F0f0`_`Test Page`_")
-print("This is a test page with environment variable support.")
-print()
+from live_support import default_live_assets
 
-print("`F0f0`_`Environment Variables`_")
-params = []
-for key, value in os.environ.items():
-    if key.startswith(('field_', 'var_')):
-        params.append(f"- `Faaa`{key}`f: `F0f0`{value}`f")
+pages, files = default_live_assets()
+Path("pages").mkdir(parents=True, exist_ok=True)
+Path("files").mkdir(parents=True, exist_ok=True)
 
-if params:
-    print("\n".join(params))
-else:
-    print("- No parameters received")
+for rel, content in pages.items():
+    path = Path("pages") / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if isinstance(content, bytes):
+        path.write_bytes(content)
+    else:
+        path.write_text(content, encoding="utf-8")
+    if rel.endswith(".mu") and str(content).startswith("#!"):
+        path.chmod(0o755)
 
-print()
-print("`F0f0`_`Remote Identity`_")
-remote_id = os.environ.get('remote_identity', '33aff86b736acd47dca07e84630fd192')  # Mock for testing
-print(f"`Faaa`{remote_id}`f")
+for rel, content in files.items():
+    path = Path("files") / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if isinstance(content, bytes):
+        path.write_bytes(content)
+    else:
+        path.write_text(content, encoding="utf-8")
 EOF
 
-chmod +x pages/index.mu
+mkdir -p config node-config
 
-cat > files/text.txt << EOF
-This is a test file.
-EOF
-
-# Start the page node in the background
-export PYTHONPATH=$(realpath ..)
-poetry run python3 -m rns_page_node.main -c config -i node-config -p pages -f files > node.log 2>&1 &
+poetry run python3 -m rns_page_node.main \
+  -c config \
+  -i node-config \
+  -p pages \
+  -f files \
+  --log-level ERROR \
+  > node.log 2>&1 &
 NODE_PID=$!
 
-# Wait for node to generate its identity file
 echo "Waiting for node identity..."
-for i in {1..40}; do
+for _ in {1..40}; do
   if [ -f node-config/identity ]; then
     echo "Identity file found"
     break
@@ -57,15 +56,21 @@ done
 if [ ! -f node-config/identity ]; then
   echo "Error: node identity file not found" >&2
   cat node.log
-  kill $NODE_PID || true
+  kill "$NODE_PID" || true
   exit 1
 fi
 
-echo "Running pytest (unit + advanced)..."
-poetry run pytest test_handlers_unit.py test_config_unit.py test_path_security.py test_advanced.py
+echo "Running unit and advanced pytest..."
+poetry run pytest \
+  test_handlers_unit.py \
+  test_config_unit.py \
+  test_path_security.py \
+  test_advanced.py
 
-echo "Running transport integration client..."
+echo "Running live transport pytest..."
+poetry run pytest test_live_transport.py
+
+echo "Running transport integration client script..."
 poetry run python3 test_client.py
 
-# Clean up
-kill $NODE_PID || true
+kill "$NODE_PID" || true

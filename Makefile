@@ -31,7 +31,7 @@ help:
 	@echo "rns-page-node $(VERSION)"
 	@echo ""
 	@echo "Build:     build sdist wheel clean install install-dev"
-	@echo "Quality:   lint format check test test-advanced"
+	@echo "Quality:   lint format check test test-advanced test-live"
 	@echo "Run:       run"
 	@echo "Publish:   publish publish-pypi"
 	@echo "Release:   release release-dist release-tag release-push release-local release-upload"
@@ -74,6 +74,9 @@ test:
 
 test-advanced:
 	poetry run pytest tests/test_advanced.py
+
+test-live:
+	poetry run pytest tests/test_live_transport.py
 
 run:
 	poetry run python3 -m rns_page_node.main

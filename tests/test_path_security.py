@@ -12,6 +12,7 @@ from rns_page_node.handlers import (
     DEFAULT_NOTALLOWED_BYTES,
     _safe_file_in_root,
     serve_file,
+    serve_media,
     serve_page,
 )
 
@@ -170,3 +171,70 @@ def test_backslash_normalized_like_slash_for_escape_attempts(tmp_path: Path) -> 
     root.mkdir()
     (tmp_path / "win.txt").write_bytes(OUTSIDE_MARKER)
     assert _safe_file_in_root(root, "..\\..\\win.txt") is None
+
+
+@pytest.mark.parametrize(
+    "media_path",
+    [
+        "/media/../outside.webp",
+        "/media/sub/../../../outside.webp",
+        "/media\\..\\..\\outside.webp",
+        "/media/..\\..\\outside.webp",
+    ],
+)
+def test_serve_media_rejects_literal_traversal_urls(
+    tmp_path: Path,
+    media_path: str,
+) -> None:
+    pages = tmp_path / "pages"
+    pages.mkdir()
+    (tmp_path / "outside.webp").write_bytes(OUTSIDE_MARKER)
+    (pages / "inside.webp").write_bytes(b"inside")
+    res = serve_media(
+        "/media",
+        {"path": media_path, "key": None},
+        b"",
+        b"",
+        None,
+        0.0,
+        pages,
+    )
+    if isinstance(res, list):
+        try:
+            assert OUTSIDE_MARKER not in res[0].read()
+        finally:
+            res[0].close()
+    else:
+        assert res is False
+
+
+@settings(
+    max_examples=200,
+    deadline=None,
+    suppress_health_check=[HealthCheck.too_slow],
+)
+@given(traversal_like_paths())
+def test_fuzz_serve_media_never_leaks_outside_bytes(rel: str) -> None:
+    with tempfile.TemporaryDirectory() as td:
+        base = Path(td)
+        pages = base / "pages"
+        pages.mkdir()
+        outside = base / "target.webp"
+        outside.write_bytes(OUTSIDE_MARKER)
+        (pages / "target.webp").write_bytes(b"inside-data")
+        path = "/media/" + rel + "/target.webp"
+        res = serve_media(
+            "/media",
+            {"path": path, "key": None},
+            b"",
+            b"",
+            None,
+            0.0,
+            pages,
+        )
+        if isinstance(res, list):
+            raw = res[0].read()
+            res[0].close()
+            assert OUTSIDE_MARKER not in raw
+        else:
+            assert res is False
