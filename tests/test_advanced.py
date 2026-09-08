@@ -51,7 +51,7 @@ class AdvancedTests(unittest.TestCase):
     def test_smoke(self):
         """Basic smoke test to ensure node is initialized and has handlers."""
         self.assertIsNotNone(self.node.destination)
-        self.assertTrue(len(self.node.servedpages) >= 1)
+        self.assertGreaterEqual(len(self.node.servedpages), 1)
 
     def test_performance(self):
         """Measure performance of request handlers."""
