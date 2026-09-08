@@ -1,0 +1,9 @@
+- Languages
+  - [English](/en/)
+  - [Deutsch](/de/)
+  - [Español](/es/)
+  - [Français](/fr/)
+  - [Italiano](/it/)
+  - [日本語](/ja/)
+  - [Русский](/ru/)
+  - [简体中文](/zh-cn/)

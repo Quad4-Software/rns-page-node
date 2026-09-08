@@ -13,11 +13,15 @@
       window.$docsify = {
         name: "rns-page-node",
         repo: "https://github.com/Quad4-Software/rns-page-node",
-        basePath: "en/",
+        homepage: "en/README.md",
         loadSidebar: true,
         loadNavbar: true,
         subMaxLevel: 2,
         auto2top: true,
+        alias: {
+          "/": "/en/",
+          "/_sidebar.md": "/en/_sidebar.md",
+        },
         search: {
           placeholder: "Search",
           noData: "No results",

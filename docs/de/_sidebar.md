@@ -1,0 +1,6 @@
+- [Startseite](/de/)
+- English
+  - [English docs](/en/)
+  - [Installation](/en/installation)
+  - [Usage](/en/usage)
+  - [Configuration](/en/configuration)

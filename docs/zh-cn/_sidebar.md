@@ -1,0 +1,6 @@
+- [首页](/zh-cn/)
+- 英文
+  - [英文文档](/en/)
+  - [安装](/en/installation)
+  - [使用](/en/usage)
+  - [配置](/en/configuration)

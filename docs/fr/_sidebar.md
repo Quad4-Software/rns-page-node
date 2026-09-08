@@ -1,0 +1,6 @@
+- [Accueil](/fr/)
+- Anglais
+  - [Documentation en anglais](/en/)
+  - [Installation](/en/installation)
+  - [Utilisation](/en/usage)
+  - [Configuration](/en/configuration)

@@ -1,0 +1,6 @@
+- [ホーム](/ja/)
+- 英語
+  - [英語のドキュメント](/en/)
+  - [インストール](/en/installation)
+  - [使い方](/en/usage)
+  - [設定](/en/configuration)

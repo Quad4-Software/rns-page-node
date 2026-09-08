@@ -1,0 +1,6 @@
+- [Inicio](/es/)
+- Inglés
+  - [Documentación en inglés](/en/)
+  - [Instalación](/en/installation)
+  - [Uso](/en/usage)
+  - [Configuración](/en/configuration)
