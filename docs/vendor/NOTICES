@@ -1,6 +1,18 @@
 Vendored assets
 
-- docsify.min.js, core.min.css, search.min.js
+- docsify.min.js, search.min.js
   Source: https://github.com/docsifyjs/docsify
-  Version: 5.0.0
+  Version: 4.13.1
   License: MIT
+
+- dark.css
+  Source: https://github.com/docsifyjs/docsify/tree/master/lib/themes
+  License: MIT
+
+- theme.css
+  Source: https://github.com/Quad4-Software/pip-rns
+  License: BSD-2-Clause
+
+- IBM Plex Sans and IBM Plex Mono font files
+  Source: https://github.com/fontsource/font-files
+  License: OFL-1.1
