@@ -22,8 +22,8 @@ DEFAULT_INDEX_BYTES = DEFAULT_INDEX.encode("utf-8")
 DEFAULT_NOTALLOWED_BYTES = DEFAULT_NOTALLOWED.encode("utf-8")
 
 MEDIA_EXTS = [".webp"]
-_MAX_MEDIA_INPUT_PATH = 512
-_MAX_MEDIA_RESOLVED_PATH = 1024
+_MEDIA_EXT_SET = frozenset(MEDIA_EXTS)
+_MAX_MEDIA_INPUT_PATH = 4096
 
 
 def _relative_under_route(path: str, prefix_with_slash: str) -> str:
@@ -31,35 +31,21 @@ def _relative_under_route(path: str, prefix_with_slash: str) -> str:
     return path[n:] if path.startswith(prefix_with_slash) else path[n - 1 :]
 
 
-def _safe_file_in_root(root: Path, relative: str) -> Optional[Path]:
-    if "\x00" in relative:
-        return None
-    relative = relative.replace("\\", "/")
-    root = root.resolve()
-    try:
-        candidate = (root / relative).resolve()
-    except (OSError, ValueError):
-        return None
-    try:
-        candidate.relative_to(root)
-    except ValueError:
-        return None
-    return candidate
-
-
 def _safe_join_resolved_root(root: Path, relative: str) -> Optional[Path]:
     if "\x00" in relative:
         return None
     relative = relative.replace("\\", "/")
     try:
-        candidate = (root / relative).resolve()
+        root_str = os.path.realpath(str(root))
+        candidate_str = os.path.realpath(os.path.join(root_str, relative))
+        if os.path.commonpath([candidate_str, root_str]) != root_str:
+            return None
     except (OSError, ValueError):
         return None
-    try:
-        candidate.relative_to(root)
-    except ValueError:
-        return None
-    return candidate
+    return Path(candidate_str)
+
+
+_safe_file_in_root = _safe_join_resolved_root
 
 
 def serve_default_index(
@@ -153,7 +139,12 @@ def serve_file(
 ) -> Union[bytes, list[Any]]:
     relative_path = _relative_under_route(path, "/file/")
     file_path = _safe_join_resolved_root(filespath, relative_path)
-    if file_path is None or not file_path.is_file():
+    if file_path is None:
+        return DEFAULT_NOTALLOWED_BYTES
+    try:
+        if not file_path.is_file():
+            return DEFAULT_NOTALLOWED_BYTES
+    except OSError:
         return DEFAULT_NOTALLOWED_BYTES
 
     try:
@@ -173,7 +164,7 @@ def serve_media(
     _link_id: bytes,
     _remote_identity: Any,
     _requested_at: float,
-    pagespath: Path,
+    mediapath: Path,
 ) -> Union[bytes, list[Any], bool]:
     if not isinstance(data, dict):
         return False
@@ -186,22 +177,20 @@ def serve_media(
         return False
 
     relative = media_path.lstrip("/").removeprefix("media/").lstrip("/")
-    file_path = _safe_join_resolved_root(pagespath, relative)
+    file_path = _safe_join_resolved_root(mediapath, relative)
     if file_path is None:
         return False
-    if len(str(file_path)) > _MAX_MEDIA_RESOLVED_PATH:
-        RNS.log(
-            f"Invalid media request path length: {len(str(file_path))}",
-            RNS.LOG_DEBUG,
-        )
+    if file_path.suffix.lower() not in _MEDIA_EXT_SET:
+        if RNS.loglevel >= RNS.LOG_DEBUG:
+            RNS.log(
+                f"Invalid media request type: {file_path}, must be in {MEDIA_EXTS}",
+                RNS.LOG_DEBUG,
+            )
         return False
-    if file_path.suffix.lower() not in MEDIA_EXTS:
-        RNS.log(
-            f"Invalid media request type: {file_path}, must be in {MEDIA_EXTS}",
-            RNS.LOG_DEBUG,
-        )
-        return False
-    if not file_path.is_file():
+    try:
+        if not file_path.is_file():
+            return False
+    except OSError:
         return False
 
     try:

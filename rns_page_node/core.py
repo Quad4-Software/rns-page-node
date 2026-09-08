@@ -18,6 +18,7 @@ class PageNode:
         identity: RNS.Identity,
         pagespath: str,
         filespath: str,
+        mediapath: Optional[str] = None,
         announce_interval: int = 360,
         name: Optional[str] = None,
         page_refresh_interval: int = 0,
@@ -29,6 +30,7 @@ class PageNode:
         self.name = name
         self.pagespath = Path(pagespath)
         self.filespath = Path(filespath)
+        self.mediapath = Path(mediapath) if mediapath else self.pagespath
         self.destination = RNS.Destination(
             identity,
             RNS.Destination.IN,
@@ -116,7 +118,7 @@ class PageNode:
             link_id,
             remote_identity,
             requested_at,
-            self._pages_root,
+            self._media_root,
         )
 
     def register_pages(self) -> None:
@@ -172,7 +174,7 @@ class PageNode:
             )
 
     def register_media(self) -> None:
-        self._pages_root = self.pagespath.resolve()
+        self._media_root = self.mediapath.resolve()
         self.destination.register_request_handler(
             "/media",
             response_generator=self.serve_media,

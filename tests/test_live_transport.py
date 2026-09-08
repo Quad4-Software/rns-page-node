@@ -27,8 +27,8 @@ def live_stack(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> tuple[LiveNodeServer, LiveTransportClient]:
     root = tmp_path_factory.mktemp("live_transport")
-    pages, files = default_live_assets()
-    server = LiveNodeServer(root, pages, files)
+    pages, files, media = default_live_assets()
+    server = LiveNodeServer(root, pages, files, media)
     server.start()
     client = LiveTransportClient(server.config_dir, server.identity_file())
     yield server, client
@@ -143,9 +143,9 @@ def test_live_default_index_without_index_mu(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
     root = tmp_path_factory.mktemp("live_default_index")
-    pages, files = default_live_assets()
+    pages, files, media = default_live_assets()
     del pages["index.mu"]
-    with LiveNodeServer(root, pages, files) as server:
+    with LiveNodeServer(root, pages, files, media) as server:
         config_dir = server.config_dir
         identity_file = server.identity_file()
         code = f"""
@@ -164,8 +164,8 @@ def test_live_subprocess_client_script(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
     root = tmp_path_factory.mktemp("live_client_script")
-    pages, files = default_live_assets()
-    with LiveNodeServer(root, pages, files) as server:
+    pages, files, media = default_live_assets()
+    with LiveNodeServer(root, pages, files, media) as server:
         config_dir = server.config_dir
         identity_file = server.identity_file()
         code = f"""

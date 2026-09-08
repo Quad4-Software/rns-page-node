@@ -6,13 +6,20 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Support for serving WebP images to NomadNet 1.4.x clients through a new /media request handler.
-- Images are served from the pages directory and must use the .webp extension.
+- Images are served from the pages directory by default, or from a custom directory set with --media-dir, the media-dir config option, or the RNS_PAGE_NODE_MEDIA_DIR environment variable.
 - Traversal, non-WebP, and malformed media requests are rejected.
-- Unit, security fuzz, and live RNS transport tests cover the /media handler.
+- Unit, security fuzz, adversarial, oracle, stress, and live RNS transport tests cover the /media handler and separate media root.
+- Stress tests exercise deep nesting, symlink escapes, long path boundaries, and concurrent access.
 
 ### Changed
 - Minimum RNS dependency raised to 1.5.0. Cryptography lower bound set to 3.4.7 with no upper cap.
 - Added live RNS link integration tests, a shared live test harness, and a test-live make target.
+- Path containment now resolves symlinks with os.path.realpath and verifies containment with os.path.commonpath, replacing Path.resolve and Path.relative_to for a simpler, faster, and more robust check.
+
+### Fixed
+- Removed a redundant resolved path length limit that blocked deep nested media paths.
+- Raised the media request path limit to 4096 to match filesystem limits.
+- OSError from file existence checks is now caught so invalid filenames return a safe rejection instead of raising.
 
 ## [1.6.0] - 2026-05-30
 

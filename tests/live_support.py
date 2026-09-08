@@ -95,16 +95,19 @@ class LiveNodeServer:
         root: Path,
         pages: dict[str, str | bytes],
         files: dict[str, str | bytes],
+        media: Optional[dict[str, str | bytes]] = None,
         node_name: Optional[str] = "Live Test Node",
     ) -> None:
         self.root = root
         self.pages = pages
         self.files = files
+        self.media = media or {}
         self.node_name = node_name
         self.config_dir = root / "config"
         self.identity_dir = root / "node-config"
         self.pages_dir = root / "pages"
         self.files_dir = root / "files"
+        self.media_dir = root / "media"
         self.log_file = root / "node.log"
         self._proc: Optional[subprocess.Popen[str]] = None
 
@@ -121,6 +124,7 @@ class LiveNodeServer:
         self.identity_dir.mkdir(parents=True, exist_ok=True)
         self.pages_dir.mkdir(parents=True, exist_ok=True)
         self.files_dir.mkdir(parents=True, exist_ok=True)
+        self.media_dir.mkdir(parents=True, exist_ok=True)
         self._write_assets()
 
         env = os.environ.copy()
@@ -137,6 +141,8 @@ class LiveNodeServer:
             str(self.pages_dir),
             "-f",
             str(self.files_dir),
+            "-m",
+            str(self.media_dir),
             "--log-level",
             "ERROR",
         ]
@@ -180,6 +186,14 @@ class LiveNodeServer:
 
         for rel, content in self.files.items():
             path = self.files_dir / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if isinstance(content, bytes):
+                path.write_bytes(content)
+            else:
+                path.write_text(content, encoding="utf-8")
+
+        for rel, content in self.media.items():
+            path = self.media_dir / rel
             path.parent.mkdir(parents=True, exist_ok=True)
             if isinstance(content, bytes):
                 path.write_bytes(content)
@@ -275,7 +289,11 @@ class LiveTransportClient:
             self.link.close()
 
 
-def default_live_assets() -> tuple[dict[str, str | bytes], dict[str, str | bytes]]:
+def default_live_assets() -> tuple[
+    dict[str, str | bytes],
+    dict[str, str | bytes],
+    dict[str, str | bytes],
+]:
     index_mu = """#!/usr/bin/env python3
 import os
 
@@ -295,11 +313,13 @@ print(os.environ.get("remote_identity", "missing"))
         "static.mu": "plain static body",
         "nested/deep.mu": "nested page body",
         "script_remote.mu": script_remote,
-        "image.webp": b"fake webp payload",
     }
     files = {
         "text.txt": "This is a test file.\n",
         "data.bin": b"binary\x00payload",
         "nested/nested.txt": "nested file body",
     }
-    return pages, files
+    media = {
+        "image.webp": b"fake webp payload",
+    }
+    return pages, files, media

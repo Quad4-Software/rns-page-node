@@ -14,6 +14,11 @@ pages-dir=./pages
 # Files directory
 files-dir=./files
 
+# Media directory for images
+# Defaults to pages directory if not set
+# Can also be set with the RNS_PAGE_NODE_MEDIA_DIR environment variable
+media-dir=./media
+
 # Node identity directory
 identity-dir=./node-config
 

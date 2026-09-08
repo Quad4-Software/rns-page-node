@@ -11,9 +11,10 @@ from pathlib import Path
 
 from live_support import default_live_assets
 
-pages, files = default_live_assets()
+pages, files, media = default_live_assets()
 Path("pages").mkdir(parents=True, exist_ok=True)
 Path("files").mkdir(parents=True, exist_ok=True)
+Path("media").mkdir(parents=True, exist_ok=True)
 
 for rel, content in pages.items():
     path = Path("pages") / rel
@@ -32,6 +33,14 @@ for rel, content in files.items():
         path.write_bytes(content)
     else:
         path.write_text(content, encoding="utf-8")
+
+for rel, content in media.items():
+    path = Path("media") / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if isinstance(content, bytes):
+        path.write_bytes(content)
+    else:
+        path.write_text(content, encoding="utf-8")
 EOF
 
 mkdir -p config node-config
@@ -41,6 +50,7 @@ poetry run python3 -m rns_page_node.main \
   -i node-config \
   -p pages \
   -f files \
+  -m media \
   --log-level ERROR \
   > node.log 2>&1 &
 NODE_PID=$!
@@ -65,6 +75,10 @@ poetry run pytest \
   test_handlers_unit.py \
   test_config_unit.py \
   test_path_security.py \
+  test_media_oracle.py \
+  test_media_adversarial.py \
+  test_media_stress.py \
+  test_media_performance.py \
   test_advanced.py
 
 echo "Running live transport pytest..."

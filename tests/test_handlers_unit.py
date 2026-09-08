@@ -268,3 +268,27 @@ def test_serve_media_rejects_nul_and_long_paths(tmp_path: Path) -> None:
         tmp_path,
     )
     assert res_long is False
+
+
+def test_serve_media_uses_separate_media_dir(tmp_path: Path) -> None:
+    pages = tmp_path / "pages"
+    media = tmp_path / "media"
+    pages.mkdir()
+    media.mkdir()
+    (pages / "image.webp").write_bytes(b"from pages")
+    (media / "image.webp").write_bytes(b"from media")
+    res = serve_media(
+        "/media",
+        {"path": "/media/image.webp", "key": None},
+        b"rid",
+        b"lid",
+        None,
+        0.0,
+        media,
+    )
+    assert isinstance(res, list)
+    body, _meta = res
+    try:
+        assert body.read() == b"from media"
+    finally:
+        body.close()

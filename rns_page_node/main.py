@@ -32,6 +32,15 @@ def main() -> None:
         "files-dir",
         config,
     )
+    media_dir = get_config_value(
+        args.media_dir,
+        None,
+        "media-dir",
+        config,
+        env="RNS_PAGE_NODE_MEDIA_DIR",
+    )
+    if not media_dir:
+        media_dir = pages_dir
     node_name = get_config_value(args.node_name, None, "node-name", config)
     announce_interval = get_config_value(
         args.announce_interval,
@@ -75,11 +84,13 @@ def main() -> None:
 
     Path(pages_dir).mkdir(parents=True, exist_ok=True)
     Path(files_dir).mkdir(parents=True, exist_ok=True)
+    Path(media_dir).mkdir(parents=True, exist_ok=True)
 
     node = PageNode(
         identity,
         pages_dir,
         files_dir,
+        media_dir,
         announce_interval,
         node_name,
         page_refresh_interval,

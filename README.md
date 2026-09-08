@@ -71,7 +71,7 @@ rns-page-node
 or with command-line options:
 
 ```bash
-rns-page-node --node-name "Page Node" --pages-dir ./pages --files-dir ./files --identity-dir ./node-config --announce-interval 360
+rns-page-node --node-name "Page Node" --pages-dir ./pages --files-dir ./files --media-dir ./media --identity-dir ./node-config --announce-interval 360
 ```
 
 or with a config file:
@@ -91,11 +91,12 @@ Config file format is simple `key=value` pairs:
 node-name=My Page Node
 pages-dir=./pages
 files-dir=./files
+media-dir=./media
 identity-dir=./node-config
 announce-interval=360
 ```
 
-Priority order: Command-line arguments > Config file > Defaults
+Priority order: Command-line arguments > Environment variables > Config file > Defaults
 
 ## Build
 
@@ -153,6 +154,7 @@ Optional arguments:
   -n, --node-name         Name of the node
   -p, --pages-dir         Directory to serve pages from
   -f, --files-dir         Directory to serve files from
+  -m, --media-dir         Directory to serve images from (defaults to pages directory)
   -i, --identity-dir      Directory to persist the node's identity
   -a, --announce-interval Interval to announce the node's presence (in minutes, default: 360 = 6 hours)
   --page-refresh-interval Interval to refresh pages (in seconds, 0 = disabled)

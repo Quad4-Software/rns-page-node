@@ -173,6 +173,27 @@ def test_backslash_normalized_like_slash_for_escape_attempts(tmp_path: Path) -> 
     assert _safe_file_in_root(root, "..\\..\\win.txt") is None
 
 
+def test_serve_media_separate_root_blocks_escape_to_pages(
+    tmp_path: Path,
+) -> None:
+    pages = tmp_path / "pages"
+    media = tmp_path / "media"
+    pages.mkdir()
+    media.mkdir()
+    (pages / "outside.webp").write_bytes(OUTSIDE_MARKER)
+    (media / "inside.webp").write_bytes(b"inside")
+    res = serve_media(
+        "/media",
+        {"path": "/media/../pages/outside.webp", "key": None},
+        b"",
+        b"",
+        None,
+        0.0,
+        media,
+    )
+    assert res is False
+
+
 @pytest.mark.parametrize(
     "media_path",
     [

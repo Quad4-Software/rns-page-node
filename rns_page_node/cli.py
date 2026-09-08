@@ -1,8 +1,9 @@
 """CLI argument parsing and logging configuration for rns-page-node."""
 
 import argparse
+import os
 from pathlib import Path
-from typing import Type, TypeVar
+from typing import Optional, Type, TypeVar
 
 import RNS
 
@@ -43,6 +44,13 @@ def setup_parser() -> argparse.ArgumentParser:
         dest="files_dir",
         help="Files directory",
         default=str(Path.cwd() / "files"),
+    )
+    parser.add_argument(
+        "-m",
+        "--media-dir",
+        dest="media_dir",
+        help="Media directory for images, defaults to pages directory",
+        default=None,
     )
     parser.add_argument(
         "-n",
@@ -97,10 +105,11 @@ def get_config_value(
     config_key: str,
     config: dict[str, str],
     value_type: Type[T] = str,
+    env: Optional[str] = None,
 ) -> T:
-    """Get value from CLI args, config file, or default.
+    """Get value from CLI args, environment, config file, or default.
 
-    Priority: CLI arg > config file > default
+    Priority: CLI arg > environment > config file > default
 
     Args:
         arg_value: Value from command line argument
@@ -108,6 +117,7 @@ def get_config_value(
         config_key: Key in the configuration dictionary
         config: Configuration dictionary
         value_type: Expected type of the value
+        env: Optional environment variable name
 
     Returns:
         The resolved value
@@ -115,6 +125,17 @@ def get_config_value(
     """
     if arg_value != arg_default:
         return arg_value
+    if env and env in os.environ:
+        env_value = os.environ[env]
+        try:
+            if value_type is int:
+                return int(env_value)  # type: ignore
+            return env_value  # type: ignore
+        except (ValueError, TypeError):
+            RNS.log(
+                f"Invalid {value_type.__name__} value for {env}: {env_value}",
+                RNS.LOG_WARNING,
+            )
     if config_key in config:
         try:
             if value_type is int:
