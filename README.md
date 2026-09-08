@@ -16,7 +16,7 @@ The project targets RNS 1.5.0 and newer and Python 3.10 and newer.
 
 ## Installation
 
-Requires rns-page-node 1.6.1 or newer for Reticulum (rns) 1.5.0. Older PyPI releases cap rns below 1.5.0 and cryptography below 47, which conflicts with current Reticulum.
+Requires Python 3.10 or newer. The package depends on RNS 1.5.0 or newer and cryptography 50.0.0 or newer. Older releases cap these below the required versions, which conflicts with current Reticulum.
 
 ### From PyPI
 
@@ -54,11 +54,17 @@ uv tool install "git+https://github.com/Quad4-Software/rns-page-node.git"
 
 ### From an rngit release
 
-If you use Reticulum and have [rngit](https://github.com/markqvist/Reticulum) configured, fetch a release from the project RNS remote (same URL as `git remote get-url origin` when using RNS):
+If you use Reticulum and have `rngit` configured, fetch a release from the project RNS remote. The remote is `rns://06a54b505bb67b25ef3f8097e8001edc/public/rns-page-node`, which is the same URL as `git remote get-url origin` when using the RNS remote.
 
 ```bash
-rngit release fetch v1.6.0:all
-pip install dist/rns_page_node-*.whl
+rngit release rns://06a54b505bb67b25ef3f8097e8001edc/public/rns-page-node fetch v1.7.0:all
+pip install v1.7.0/rns_page_node-1.7.0-py3-none-any.whl
+```
+
+With `pip-rns`:
+
+```bash
+pip-rns install --from-release rns://06a54b505bb67b25ef3f8097e8001edc/public/rns-page-node --ref v1.7.0
 ```
 
 ## Usage

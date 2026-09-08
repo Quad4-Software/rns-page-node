@@ -10,11 +10,38 @@ The `rns-page-node-pure` package depends on `rnspure` instead. The `rnspure` pac
 - You are running on an unusual architecture.
 - You want the smallest dependency tree and are willing to trade speed.
 
-## How to install
+## Install from PyPI
 
 ```bash
 pip install rns-page-node-pure
 ```
+
+## Install from the RNS remote
+
+With `pip-rns`:
+
+```bash
+pip-rns install --from-release rns://06a54b505bb67b25ef3f8097e8001edc/public/rns-page-node-pure --ref v1.7.0
+```
+
+With `rngit`:
+
+```bash
+rngit release rns://06a54b505bb67b25ef3f8097e8001edc/public/rns-page-node-pure fetch v1.7.0:all
+pip install v1.7.0/rns_page_node_pure-1.7.0-py3-none-any.whl
+```
+
+The pure package has a separate RNS remote and package name because it depends on `rnspure` instead of `rns`. Do not install both packages into the same environment.
+
+## Build a pure zipapp
+
+From the repository root:
+
+```bash
+make pyz-pure
+```
+
+The output is `dist/rns-page-node-pure.pyz`. It contains `rnspure` and the node source and runs on any system with Python 3.10.
 
 ## Performance and security note
 

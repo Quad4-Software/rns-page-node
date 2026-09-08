@@ -4,6 +4,8 @@ rns-page-node turns a directory of Micron pages and files into a destination on 
 
 It is a single Python package with one job: read pages and files from disk, keep them inside a path jail, and serve them over an RNS destination.
 
+You can install it from PyPI, from a release over the Reticulum network, from a local wheel, as an offline `.pyz` zipapp, or by cloning the source.
+
 ## What it serves
 
 - Micron pages ending in .mu under the page route.
@@ -25,12 +27,16 @@ pip install rns-page-node
 rns-page-node
 ```
 
-This starts a node with the default pages, files and node-config directories in the current working directory. Read the [installation guide](installation) for pip, source, zipapp and pure package options.
+This starts a node with the default pages, files and node-config directories in the current working directory.
+
+## Install paths
+
+- [Installation](installation) covers pip, wheels, zipapps, source clones and shell completions.
+- [Install from Reticulum](reticulum-install) explains how to fetch a signed release with `pip-rns` or `rngit`.
+- [Offline install and zipapps](offline) covers `.pyz`, `opip` bundles and `pip-rns export` for USB sharing.
+- [Pure Python variant](pure) explains the `rns-page-node-pure` package for systems without compiled dependencies.
 
 ## Quick links
 
-- [Installation](installation)
 - [Usage](usage)
 - [Configuration](configuration)
-- [Offline zipapp](offline)
-- [Pure Python variant](pure)

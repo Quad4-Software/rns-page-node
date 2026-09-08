@@ -1,6 +1,7 @@
 - [Home](/)
 - [Installation](installation)
+- [Install from Reticulum](reticulum-install)
 - [Usage](usage)
 - [Configuration](configuration)
-- [Offline zipapp](offline)
+- [Offline install and zipapps](offline)
 - [Pure Python variant](pure)

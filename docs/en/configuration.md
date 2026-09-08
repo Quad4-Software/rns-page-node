@@ -7,19 +7,42 @@ Values are resolved in this order:
 3. Config file key.
 4. Built-in default.
 
+A value passed on the command line beats the same value from the config file. A config file value beats the default.
+
 ## Config file format
 
 The file is plain text. Each line is a `key=value` pair. Lines starting with `#` are comments. Empty lines are ignored.
 
+A minimal config file:
+
 ```text
-reticulum-config=~/.reticulum
+# rns-page-node configuration file
+# Lines starting with # are comments
+# Format: key=value
+
+# Node display name
+node-name=My Page Node
+
+# Directories
 pages-dir=./pages
 files-dir=./files
 media-dir=./media
-node-name=My Page Node
+identity-dir=./node-config
+
+# Announce interval in minutes (default: 360 = 6 hours)
 announce-interval=360
+
+# Page refresh interval in seconds (0 = disabled)
+page-refresh-interval=300
+
+# File refresh interval in seconds (0 = disabled)
+file-refresh-interval=300
+
+# Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 log-level=INFO
 ```
+
+You can find a working example in the repository at `config.example`.
 
 ## CLI flags and environment variables
 
@@ -43,3 +66,38 @@ The first positional argument is the path to a config file.
 ```bash
 rns-page-node myconfig.conf
 ```
+
+You can still override a single value with a flag:
+
+```bash
+rns-page-node myconfig.conf --log-level DEBUG
+```
+
+## Environment variables
+
+The only environment variable with a special name is `RNS_PAGE_NODE_MEDIA_DIR`. It sets the media directory if no `--media-dir` flag is given. It is checked before the config file.
+
+Other settings do not use a prefix. They are read as plain keys, but the CLI flags are the usual way to set them.
+
+## Multiple ways to set the same thing
+
+This command sets the media directory with a flag:
+
+```bash
+rns-page-node -m ./media
+```
+
+This command sets it through the config file:
+
+```text
+media-dir=./media
+```
+
+And this sets it through the environment:
+
+```bash
+export RNS_PAGE_NODE_MEDIA_DIR=./media
+rns-page-node
+```
+
+Only the first source in the precedence order is used for each setting.
