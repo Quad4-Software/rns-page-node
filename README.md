@@ -4,7 +4,7 @@ A simple way to serve pages and files over the [Reticulum network](https://retic
 
 Full documentation lives in [docs/](docs). The rendered site is at https://quad4-software.github.io/rns-page-node.
 
-The project targets RNS 1.5.0 and newer and Python 3.10 and newer.
+The project targets RNS 1.5.2 and newer and Python 3.10 and newer.
 
 **Source:** [GitHub](https://github.com/Quad4-Software/rns-page-node) (code mirror). **Releases:** [PyPI](https://pypi.org/project/rns-page-node/) and signed artifacts on Reticulum via [rngit](https://github.com/markqvist/Reticulum) (`origin` RNS remote).
 
@@ -13,6 +13,7 @@ The project targets RNS 1.5.0 and newer and Python 3.10 and newer.
 - Serves simple pages and files over RNS
 - Dynamic page support with environment variables
 - Form data and request parameter parsing
+- Image Support
 
 ## Installation
 
@@ -21,18 +22,18 @@ Requires Python 3.10 or newer. The package depends on RNS 1.5.0 or newer and cry
 ### From PyPI
 
 ```bash
-pip install "rns-page-node>=1.6.1"
+pip install "rns-page-node>=1.7.0"
 # or
-pipx install "rns-page-node>=1.6.1"
+pipx install "rns-page-node>=1.7.0"
 ```
 
 With uv:
 
 ```bash
-uv tool install "rns-page-node>=1.6.1"
+uv tool install "rns-page-node>=1.7.0"
 ```
 
-If PyPI does not list 1.6.1 yet, install from GitHub (below) or upgrade an existing pipx app:
+If PyPI does not list 1.7.0 yet, install from GitHub (below) or upgrade an existing pipx app:
 
 ```bash
 pipx install "git+https://github.com/Quad4-Software/rns-page-node.git" --force
