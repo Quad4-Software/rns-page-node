@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.7.0] - 2026-09-08
+## [1.7.0] - 2026-09-10
 
 ### Added
 - Support for serving WebP images to NomadNet 1.4.x clients through a new /media request handler.

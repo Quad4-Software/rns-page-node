@@ -1,2 +1,2 @@
-rns>=1.5.0
-cryptography>=3.4.7
+rns>=1.5.2
+cryptography>=50.0.0

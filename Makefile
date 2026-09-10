@@ -63,7 +63,7 @@ pyz: build
 
 pyz-pure: build-pure
 	mkdir -p dist
-	poetry run shiv -c rns-page-node -o dist/rns-page-node-pure.pyz pure/dist/rns_page_node_pure-1.7.0-py3-none-any.whl
+	poetry run shiv -c rns-page-node -o dist/rns-page-node-pure.pyz pure/dist/rns_page_node_pure-$(VERSION)-py3-none-any.whl
 
 completions:
 	poetry run python3 tools/generate_completions.py
