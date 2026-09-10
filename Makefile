@@ -19,7 +19,7 @@ RNGIT_RELEASE_OPTS = $(if $(RNGIT_IDENTITY),-i $(RNGIT_IDENTITY),) \
 	$(if $(RNGIT_NAME),-n $(RNGIT_NAME),)
 RELEASE_TARGET = $(RELEASE_TAG):$(RELEASE_DIST)
 
-.PHONY: default help all build build-pure sdist wheel clean install install-dev
+.PHONY: default help all build build-pure sdist wheel wheel-pure clean install install-dev
 .PHONY: lint format check test test-advanced test-live run
 .PHONY: publish publish-pypi publish-pypi-pure
 .PHONY: pyz pyz-pure completions manpage docs-serve
@@ -31,7 +31,7 @@ default: help
 help:
 	@echo "rns-page-node $(VERSION)"
 	@echo ""
-	@echo "Build:     build build-pure sdist wheel pyz pyz-pure"
+	@echo "Build:     build build-pure sdist wheel wheel-pure pyz pyz-pure"
 	@echo "Docs:      completions manpage docs-serve"
 	@echo "Quality:   lint format check test test-advanced test-live"
 	@echo "Run:       run"
@@ -56,6 +56,10 @@ sdist:
 
 wheel:
 	poetry run python3 -m build --wheel
+
+wheel-pure: build-pure
+	mkdir -p dist
+	cp -f pure/dist/rns_page_node_pure-$(VERSION)-py3-none-any.whl dist/
 
 pyz: build
 	mkdir -p dist
